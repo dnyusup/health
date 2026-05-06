@@ -25,13 +25,11 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Parts - semua user bisa lihat
-    Route::get('parts', [AssyPartController::class, 'index'])->name('parts.index');
-    Route::get('parts/{part}', [AssyPartController::class, 'show'])->name('parts.show');
+    // Parts - semua user bisa full CRUD
+    Route::resource('parts', AssyPartController::class);
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
-        Route::resource('parts', AssyPartController::class)->except(['index', 'show']);
     });
 });
