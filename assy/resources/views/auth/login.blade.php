@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login - SPART</title>
+    <title>Login - Assy Part</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,7 +101,7 @@
                 <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg mb-4">
                     <i class="fas fa-warehouse text-white text-2xl"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-white">SPART</h1>
+                <h1 class="text-3xl font-bold text-white">Assy Part</h1>
                 <p class="text-slate-400 mt-2">Sparepart Inventory Management</p>
             </div>
             
@@ -179,7 +179,7 @@
             
             <!-- Footer -->
             <p class="text-center text-slate-500 text-sm mt-6">
-                &copy; {{ date('Y') }} SPART. All rights reserved.
+                &copy; {{ date('Y') }} Assy Part. All rights reserved.
             </p>
         </div>
     </div>
