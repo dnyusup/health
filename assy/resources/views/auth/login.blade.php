@@ -102,7 +102,7 @@
                     <i class="fas fa-warehouse text-white text-2xl"></i>
                 </div>
                 <h1 class="text-3xl font-bold text-white">Assy Part</h1>
-                <p class="text-slate-400 mt-2">Sparepart Inventory Management</p>
+                <p class="text-slate-400 mt-2">Assy Part Track & Trace</p>
             </div>
             
             <!-- Login Card -->
