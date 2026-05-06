@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AssyPartController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Guest)
@@ -24,8 +25,13 @@ Route::middleware('auth')->group(function () {
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
+    // Parts - semua user bisa lihat
+    Route::get('parts', [AssyPartController::class, 'index'])->name('parts.index');
+    Route::get('parts/{part}', [AssyPartController::class, 'show'])->name('parts.show');
+
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
         Route::resource('users', UserController::class);
+        Route::resource('parts', AssyPartController::class)->except(['index', 'show']);
     });
 });
