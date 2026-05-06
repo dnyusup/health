@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AssyPart;
+use App\Services\AssyPartExcelService;
 use Illuminate\Http\Request;
 
 class AssyPartController extends Controller
@@ -92,5 +93,38 @@ class AssyPartController extends Controller
     {
         $part->delete();
         return redirect()->route('parts.index')->with('success', 'Part berhasil dihapus.');
+    }
+
+    public function exportExcel(AssyPartExcelService $service)
+    {
+        ini_set('memory_limit', '256M');
+        set_time_limit(300);
+        ob_end_clean();
+        $service->export();
+        exit;
+    }
+
+    public function importExcel(Request $request, AssyPartExcelService $service)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls|max:51200',
+        ]);
+
+        ini_set('memory_limit', '512M');
+        set_time_limit(600);
+
+        $stats = $service->import($request->file('file'), auth()->id());
+
+        $message = "Import selesai: {$stats['inserted']} ditambahkan, {$stats['updated']} diperbarui, {$stats['skipped']} dilewati.";
+
+        if (!empty($stats['errors'])) {
+            $errorList = implode(' | ', array_slice($stats['errors'], 0, 5));
+            $more = count($stats['errors']) > 5 ? ' ... dan ' . (count($stats['errors']) - 5) . ' error lainnya.' : '';
+            return redirect()->route('parts.index')
+                ->with('success', $message)
+                ->with('import_errors', $errorList . $more);
+        }
+
+        return redirect()->route('parts.index')->with('success', $message);
     }
 }

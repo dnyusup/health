@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
 
     // Parts - semua user bisa full CRUD
     Route::resource('parts', AssyPartController::class);
+    Route::get('parts-export', [AssyPartController::class, 'exportExcel'])->name('parts.export');
+    Route::post('parts-import', [AssyPartController::class, 'importExcel'])->name('parts.import');
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
