@@ -19,8 +19,8 @@ class StockTransactionController extends Controller
         // Default filter values
         $defaultType = $request->has('type') ? $request->type : 'out';
         $defaultStatuses = $request->has('status') ? (array)$request->status : ['new', 'changed'];
-        $defaultFrom = $request->has('date_from') ? $request->date_from : now()->format('Y-m-d');
-        $defaultTo = $request->has('date_to') ? $request->date_to : now()->format('Y-m-d');
+        $defaultFrom = $request->has('date_from') ? $request->date_from : null;
+        $defaultTo = $request->has('date_to') ? $request->date_to : null;
 
         if ($request->filled('search')) {
             $search = $request->search;
