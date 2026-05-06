@@ -13,8 +13,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class AssyPartExcelService
 {
-    private const CHUNK_SIZE = 1000;
-
     /**
      * Export all parts to Excel using cursor() for memory efficiency.
      * Streams directly to browser without loading all data into memory.
@@ -79,8 +77,8 @@ class AssyPartExcelService
     }
 
     /**
-     * Import parts from Excel using ChunkReadFilter for memory efficiency.
-     * Uses upsert (insert or update by part_id) for idempotent imports.
+     * Import parts from Excel.
+     * Reads the file once using row iterator, batches DB writes every 500 rows.
      *
      * @return array{inserted: int, updated: int, skipped: int, errors: array}
      */
@@ -91,130 +89,113 @@ class AssyPartExcelService
         $reader = IOFactory::createReaderForFile($file->getPathname());
         $reader->setReadDataOnly(true);
 
-        // First pass: get total row count
-        $reader->setReadFilter(new ChunkReadFilter(2, 2));
         $spreadsheet = $reader->load($file->getPathname());
-        $totalRows = $spreadsheet->getActiveSheet()->getHighestDataRow();
-        $spreadsheet->disconnectWorksheets();
-        unset($spreadsheet);
+        $worksheet   = $spreadsheet->getActiveSheet();
 
-        if ($totalRows < 2) {
+        if ($worksheet->getHighestDataRow() < 2) {
+            $spreadsheet->disconnectWorksheets();
             $stats['errors'][] = 'File kosong atau tidak ada data.';
             return $stats;
         }
 
-        // Get existing part_ids for quick lookup
+        // Pre-load existing part_ids (id => part_id) for insert/update detection
         $existingPartIds = DB::table('assy_parts')->pluck('id', 'part_id')->toArray();
 
-        // Process in chunks
-        $startRow = 2;
-        while ($startRow <= $totalRows) {
-            $filter = new ChunkReadFilter($startRow, self::CHUNK_SIZE);
-            $reader->setReadFilter($filter);
+        $batchInsert = [];
+        $batchUpdate = [];
+        $now         = now()->toDateTimeString();
+        $processed   = 0;
 
-            $spreadsheet = $reader->load($file->getPathname());
-            $rows = $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
-            $spreadsheet->disconnectWorksheets();
-            unset($spreadsheet);
+        // Start from row 2 to skip header
+        foreach ($worksheet->getRowIterator(2) as $excelRow) {
+            $cellIterator = $excelRow->getCellIterator('A', 'D');
+            $cellIterator->setIterateOnlyExistingCells(false);
 
-            $toInsert = [];
-            $toUpdate = [];
-            $now = now()->toDateTimeString();
-
-            foreach ($rows as $index => $row) {
-                // Skip header row if included
-                if ($startRow === 2 && $index === 0 && strtolower(trim($row[0] ?? '')) === 'part id') {
-                    continue;
-                }
-
-                $partId = strtoupper(trim($row[0] ?? ''));
-
-                if (empty($partId)) {
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                $category = trim($row[1] ?? '');
-                $partName = trim($row[2] ?? '');
-                $partDetail = trim($row[3] ?? '') ?: null;
-
-                if (empty($category) || empty($partName)) {
-                    $rowNum = $startRow + $index;
-                    $stats['errors'][] = "Baris {$rowNum}: Part ID '{$partId}' - Category dan Part Name wajib diisi.";
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                $data = [
-                    'part_id'    => $partId,
-                    'category'   => $category,
-                    'part_name'  => $partName,
-                    'part_detail' => $partDetail,
-                    'updated_at' => $now,
-                ];
-
-                if (isset($existingPartIds[$partId])) {
-                    $toUpdate[] = $data;
-                } else {
-                    $data['created_by'] = $userId;
-                    $data['created_at'] = $now;
-                    $toInsert[] = $data;
-                    $existingPartIds[$partId] = true; // prevent duplicate in same import
-                }
+            $cells = [];
+            foreach ($cellIterator as $cell) {
+                $cells[] = $cell->getValue();
             }
 
-            // Batch insert new records
-            if (!empty($toInsert)) {
-                foreach (array_chunk($toInsert, 500) as $chunk) {
-                    DB::table('assy_parts')->insert($chunk);
-                    $stats['inserted'] += count($chunk);
-                }
+            $partId = strtoupper(trim($cells[0] ?? ''));
+
+            if (empty($partId)) {
+                $stats['skipped']++;
+                continue;
             }
 
-            // Batch update existing records
-            if (!empty($toUpdate)) {
-                DB::transaction(function () use ($toUpdate, &$stats) {
-                    foreach (array_chunk($toUpdate, 500) as $chunk) {
-                        // upsert by part_id, update other columns
-                        DB::table('assy_parts')->upsert(
-                            $chunk,
-                            ['part_id'],
-                            ['category', 'part_name', 'part_detail', 'updated_at']
-                        );
-                        $stats['updated'] += count($chunk);
-                    }
-                });
+            $category   = trim($cells[1] ?? '');
+            $partName   = trim($cells[2] ?? '');
+            $partDetail = trim($cells[3] ?? '') ?: null;
+
+            if (empty($category) || empty($partName)) {
+                $rowNum = $excelRow->getRowIndex();
+                $stats['errors'][] = "Baris {$rowNum}: '{$partId}' - Category dan Part Name wajib diisi.";
+                $stats['skipped']++;
+                continue;
             }
 
-            $startRow += self::CHUNK_SIZE;
-            gc_collect_cycles();
+            $data = [
+                'part_id'     => $partId,
+                'category'    => $category,
+                'part_name'   => $partName,
+                'part_detail' => $partDetail,
+                'updated_at'  => $now,
+            ];
+
+            if (isset($existingPartIds[$partId])) {
+                $batchUpdate[] = $data;
+            } else {
+                $data['created_by'] = $userId;
+                $data['created_at'] = $now;
+                $batchInsert[]      = $data;
+                $existingPartIds[$partId] = true; // prevent duplicate in same batch
+            }
+
+            $processed++;
+
+            // Flush insert batch every 500 rows
+            if (count($batchInsert) >= 500) {
+                DB::table('assy_parts')->insert($batchInsert);
+                $stats['inserted'] += count($batchInsert);
+                $batchInsert = [];
+            }
+
+            // Flush update batch every 500 rows
+            if (count($batchUpdate) >= 500) {
+                DB::table('assy_parts')->upsert(
+                    $batchUpdate,
+                    ['part_id'],
+                    ['category', 'part_name', 'part_detail', 'updated_at']
+                );
+                $stats['updated'] += count($batchUpdate);
+                $batchUpdate = [];
+            }
+
+            // Free cyclic references periodically
+            if ($processed % 5000 === 0) {
+                gc_collect_cycles();
+            }
         }
+
+        // Flush remaining rows
+        if (!empty($batchInsert)) {
+            DB::table('assy_parts')->insert($batchInsert);
+            $stats['inserted'] += count($batchInsert);
+        }
+
+        if (!empty($batchUpdate)) {
+            DB::table('assy_parts')->upsert(
+                $batchUpdate,
+                ['part_id'],
+                ['category', 'part_name', 'part_detail', 'updated_at']
+            );
+            $stats['updated'] += count($batchUpdate);
+        }
+
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet, $existingPartIds);
+        gc_collect_cycles();
 
         return $stats;
-    }
-}
-
-/**
- * ChunkReadFilter: reads only a specific range of rows from Excel.
- * This prevents loading the entire file into memory at once.
- */
-class ChunkReadFilter implements \PhpOffice\PhpSpreadsheet\Reader\IReadFilter
-{
-    private int $startRow;
-    private int $endRow;
-
-    public function __construct(int $startRow, int $chunkSize)
-    {
-        $this->startRow = $startRow;
-        $this->endRow   = $startRow + $chunkSize - 1;
-    }
-
-    public function readCell(string $columnAddress, int $row, string $worksheetName = ''): bool
-    {
-        // Always include header row so column mapping stays consistent
-        if ($row === 1) {
-            return true;
-        }
-        return $row >= $this->startRow && $row <= $this->endRow;
     }
 }
