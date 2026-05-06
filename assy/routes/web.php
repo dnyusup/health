@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssyPartController;
+use App\Http\Controllers\AssyMachineController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Guest)
@@ -29,6 +30,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('parts', AssyPartController::class);
     Route::get('parts-export', [AssyPartController::class, 'exportExcel'])->name('parts.export');
     Route::post('parts-import', [AssyPartController::class, 'importExcel'])->name('parts.import');
+
+    // Machines - semua user bisa full CRUD
+    Route::resource('machines', AssyMachineController::class);
+    Route::get('machines-export', [AssyMachineController::class, 'exportExcel'])->name('machines.export');
+    Route::post('machines-import', [AssyMachineController::class, 'importExcel'])->name('machines.import');
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
