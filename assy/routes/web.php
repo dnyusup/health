@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssyPartController;
 use App\Http\Controllers\AssyMachineController;
+use App\Http\Controllers\AssyWorkOrderController;
 use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Guest)
@@ -35,6 +36,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('machines', AssyMachineController::class);
     Route::get('machines-export', [AssyMachineController::class, 'exportExcel'])->name('machines.export');
     Route::post('machines-import', [AssyMachineController::class, 'importExcel'])->name('machines.import');
+
+    // Work Orders
+    Route::resource('work-orders', AssyWorkOrderController::class);
+    Route::get('work-orders-export', [AssyWorkOrderController::class, 'exportExcel'])->name('work-orders.export');
+    Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {

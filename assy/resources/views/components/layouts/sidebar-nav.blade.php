@@ -39,6 +39,18 @@
                         </span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('work-orders.index') }}" 
+                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium {{ request()->routeIs('work-orders.*') ? 'active text-white' : 'text-slate-400 hover:text-white' }}">
+                        <span class="nav-icon w-10 h-10 rounded-lg {{ request()->routeIs('work-orders.*') ? 'bg-blue-500/20' : 'bg-slate-700/50 group-hover:bg-slate-600' }} flex items-center justify-center transition-all">
+                            <i class="fas fa-clipboard-list text-lg {{ request()->routeIs('work-orders.*') ? 'text-blue-400' : '' }}"></i>
+                        </span>
+                        <span class="flex flex-col justify-center">
+                            <span>Work Order Bongkar</span>
+                            <span class="text-[10px] text-slate-500 font-normal">Pembongkaran mesin</span>
+                        </span>
+                    </a>
+                </li>
             </ul>
         </li>
         @if(auth()->user()->isAdmin())
