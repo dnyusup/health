@@ -44,6 +44,10 @@ class AssyWorkOrderController extends Controller
 
     public function create()
     {
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isShopfloor()) {
+            abort(403);
+        }
         $machines = AssyMachine::orderBy('mach_number')->get(['id', 'mach_number', 'mach_type']);
         $users    = User::orderBy('name')->get(['id', 'name']);
         return view('work-orders.create', compact('machines', 'users'));
@@ -51,6 +55,10 @@ class AssyWorkOrderController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user();
+        if (!$user->isAdmin() && !$user->isShopfloor()) {
+            abort(403);
+        }
         $request->validate([
             'tanggal_bongkar' => 'required|date',
             'order_type'      => 'required|in:ZSPM,ZSBM',

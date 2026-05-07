@@ -61,10 +61,12 @@
                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-medium hover:bg-emerald-100 transition-all">
                     <i class="fas fa-file-excel"></i> Export Excel
                 </a>
+                @if(auth()->user()->isAdmin() || auth()->user()->isShopfloor())
                 <a href="{{ route('work-orders.create') }}"
                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25">
                     <i class="fas fa-plus"></i> Buat Work Order
                 </a>
+                @endif
             </div>
         </div>
 
