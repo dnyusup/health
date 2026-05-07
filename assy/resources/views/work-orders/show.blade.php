@@ -450,9 +450,9 @@
                     </label>
                     <select name="status" id="repairStatus" required onchange="handleStatusChange(this)"
                             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all bg-white">
-                        <option value="Open"        {{ old('status', $work_order->status) === 'Open'        ? 'selected' : '' }}>Open</option>
-                        <option value="On Progress" {{ old('status', $work_order->status) === 'On Progress' ? 'selected' : '' }}>On Progress</option>
-                        <option value="Closed"      {{ old('status', $work_order->status) === 'Closed'      ? 'selected' : '' }}>Closed</option>
+                        <option value="">-- Pilih Status --</option>
+                        <option value="On Progress" {{ old('status') === 'On Progress' ? 'selected' : '' }}>On Progress</option>
+                        <option value="Closed"      {{ old('status') === 'Closed'      ? 'selected' : '' }}>Closed</option>
                     </select>
                 </div>
 
