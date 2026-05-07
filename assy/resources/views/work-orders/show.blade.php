@@ -7,11 +7,14 @@
                 'Open'        => 'bg-emerald-100 text-emerald-700',
                 'On Progress' => 'bg-amber-100 text-amber-700',
                 'Closed'      => 'bg-slate-100 text-slate-600',
+                'Installed'   => 'bg-blue-100 text-blue-700',
                 default       => 'bg-slate-100 text-slate-500',
             };
         }
         $picAsmIds   = $work_order->pic_assembling ?? [];
         $picAsmNames = $users->whereIn('id', $picAsmIds)->pluck('name');
+        $picPasangIds   = $work_order->pic_pasang ?? [];
+        $picPasangNames = $users->whereIn('id', $picPasangIds)->pluck('name');
     @endphp
 
     <div class="max-w-4xl mx-auto space-y-6">
@@ -49,6 +52,12 @@
                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl font-medium hover:bg-blue-100 transition-all">
                     <i class="fas fa-edit"></i> Edit
                 </a>
+                @endif
+                @if($work_order->status === 'Closed' || auth()->user()->isAdmin())
+                <button onclick="openInstallModal()"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-medium hover:bg-emerald-100 transition-all">
+                    <i class="fas fa-wrench"></i> Install
+                </button>
                 @endif
                 @if(auth()->user()->isAdmin())
                 <form action="{{ route('work-orders.destroy', $work_order) }}" method="POST"
@@ -221,6 +230,67 @@
             <div class="border-t border-slate-100 pt-3 flex flex-wrap gap-4 text-xs text-slate-400">
                 <span><i class="fas fa-user mr-1"></i>Diisi oleh: <strong class="text-slate-600">{{ $work_order->repairedBy->name ?? '-' }}</strong></span>
                 <span><i class="fas fa-clock mr-1"></i>Pada: {{ $work_order->repaired_at?->format('d/m/Y H:i') }}</span>
+            </div>
+        </div>
+        @endif
+
+        <!-- Card 6: Informasi Pemasangan (only if filled) -->
+        @if($work_order->tanggal_pasang)
+        <div class="bg-white rounded-2xl shadow-sm border border-emerald-200 p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fas fa-wrench"></i> Informasi Pemasangan
+                </h2>
+                @if(auth()->user()->isAdmin())
+                <button onclick="openInstallModal()"
+                        class="text-xs text-emerald-600 hover:text-emerald-800 font-medium underline underline-offset-2">
+                    Edit
+                </button>
+                @endif
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Tanggal Pasang</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $work_order->tanggal_pasang->format('d/m/Y') }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">PIC Pasang</p>
+                    @if($picPasangNames->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($picPasangNames as $name)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                            {{ $name }}
+                        </span>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-sm text-slate-500">-</p>
+                    @endif
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-4">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Dipasang di Mesin</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $work_order->install_mach_number ?: '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Mach Type</p>
+                    <p class="text-sm text-slate-700">{{ $work_order->install_mach_type ?: '-' }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Pos</p>
+                    <p class="text-sm text-slate-700">{{ $work_order->install_pos ?: '-' }}</p>
+                </div>
+            </div>
+            @if($work_order->remark_pemasangan)
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Remark Pemasangan</p>
+                <p class="text-sm text-slate-800 whitespace-pre-wrap">{{ $work_order->remark_pemasangan }}</p>
+            </div>
+            @endif
+            <div class="border-t border-slate-100 pt-3 flex flex-wrap gap-4 text-xs text-slate-400">
+                <span><i class="fas fa-user mr-1"></i>Dipasang oleh: <strong class="text-slate-600">{{ $work_order->installedBy->name ?? '-' }}</strong></span>
+                <span><i class="fas fa-clock mr-1"></i>Pada: {{ $work_order->installed_at?->format('d/m/Y H:i') }}</span>
             </div>
         </div>
         @endif
@@ -572,9 +642,6 @@ function updateFotoLabel(input) {
     const lbl = document.getElementById('fotoLabel');
     if (input.files[0]) {
         lbl.textContent = input.files[0].name;
-        // Sync: copy the chosen file to the other input so only 1 named input submits
-        // We rename both to 'foto_kerusakan' but only the last-changed matters;
-        // simpler: disable the other input so form doesn't send an empty file field
         const other = input.id === 'fotoInput' ? document.getElementById('fotoCamera') : document.getElementById('fotoInput');
         other.disabled = true;
         input.disabled = false;
@@ -582,6 +649,279 @@ function updateFotoLabel(input) {
         lbl.textContent = '';
     }
 }
+</script>
+
+    <!-- ===================== INSTALL MODAL ===================== -->
+    @php $picPasangIdsOld = old('pic_pasang', $work_order->pic_pasang ?? []); @endphp
+    <div id="installModalOverlay"
+         class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 overflow-hidden">
+        <div class="relative bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl
+                    flex flex-col max-h-[80vh] sm:max-h-[90vh]"
+             id="installModalBox"
+             onclick="event.stopPropagation()">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-shrink-0">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-wrench text-emerald-500"></i> Form Pemasangan
+                    </h3>
+                    <p class="text-xs text-slate-500 mt-0.5">{{ $work_order->order_number ?: 'WO #'.$work_order->id }}</p>
+                </div>
+                <button onclick="closeInstallModal()" class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Form -->
+            <form action="{{ route('work-orders.install', $work_order) }}" method="POST"
+                  class="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
+                @csrf
+
+                <!-- Tanggal Pasang -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Tanggal Pasang <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="tanggal_pasang"
+                           value="{{ old('tanggal_pasang', $work_order->tanggal_pasang?->format('Y-m-d')) }}"
+                           required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all @error('tanggal_pasang') border-red-500 @enderror">
+                    @error('tanggal_pasang') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Dipasang di Mesin -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Dipasang di Mesin <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative" id="machineSearchWrapper">
+                        <input type="text" id="machineSearchInput"
+                               value="{{ $work_order->install_mach_number ?? '' }}"
+                               placeholder="Ketik untuk mencari mesin..."
+                               autocomplete="off"
+                               oninput="machineFilter(this.value)"
+                               onfocus="machineDropdownShow()"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all @error('install_machine_id') border-red-500 @enderror">
+                        <input type="hidden" name="install_machine_id" id="installMachineId"
+                               value="{{ old('install_machine_id', $work_order->install_machine_id) }}">
+                        <div id="machineDropdown"
+                             class="hidden absolute z-10 mt-1 w-full bg-white border border-slate-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                            @foreach($machines as $m)
+                            <button type="button"
+                                    onclick="selectMachine({{ $m->id }}, '{{ addslashes($m->mach_number) }}', '{{ addslashes($m->mach_type) }}')"
+                                    data-mach="{{ strtolower($m->mach_number) }} {{ strtolower($m->mach_type) }}"
+                                    class="machine-option w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-emerald-50 flex items-center justify-between">
+                                <span class="font-medium">{{ $m->mach_number }}</span>
+                                <span class="text-slate-400 text-xs">{{ $m->mach_type }}</span>
+                            </button>
+                            @endforeach
+                        </div>
+                    </div>
+                    @error('install_machine_id') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Pos -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Dipasang di Pos</label>
+                    <input type="text" name="install_pos"
+                           value="{{ old('install_pos', $work_order->install_pos) }}"
+                           placeholder="Contoh: 1, 2A, ..."
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all">
+                </div>
+
+                <!-- PIC Pasang -->
+                <div id="picPasangWrapper">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        PIC Pasang <span class="text-red-500">*</span>
+                    </label>
+                    @error('pic_pasang') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                    <div id="picPasangTrigger"
+                         onclick="picPasangToggleDropdown(event)"
+                         class="min-h-[46px] w-full px-3 py-2 rounded-xl border border-slate-200 bg-white flex flex-wrap gap-1.5 items-center cursor-pointer hover:border-emerald-400 transition-all select-none @error('pic_pasang') border-red-400 @enderror">
+                        <div id="picPasangTags" class="flex flex-wrap gap-1.5 flex-1 items-center pointer-events-none">
+                            <span id="picPasangPlaceholder" class="text-slate-400 text-sm">Pilih PIC Pasang...</span>
+                        </div>
+                        <i id="picPasangChevron" class="fas fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform duration-200 pointer-events-none"></i>
+                    </div>
+                    <div id="picPasangDropdown" class="hidden mt-1 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-md">
+                        <div class="p-2 bg-slate-50 border-b border-slate-200">
+                            <input type="text" id="picPasangSearch" placeholder="Search nama..."
+                                   oninput="picPasangFilter(this.value)"
+                                   class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-emerald-500 bg-white">
+                        </div>
+                        <ul id="picPasangList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
+                            @foreach($users as $u)
+                            <li class="pic-pasang-item" data-name="{{ strtolower($u->name) }}">
+                                <button type="button"
+                                        onclick="picPasangToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
+                                        id="picPasangBtn_{{ $u->id }}"
+                                        class="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
+                                               {{ in_array($u->id, $picPasangIdsOld) ? 'bg-emerald-50 text-emerald-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
+                                    <span>{{ $u->name }}</span>
+                                    <i id="picPasangCheck_{{ $u->id }}" class="fas fa-check text-emerald-500 {{ in_array($u->id, $picPasangIdsOld) ? '' : 'invisible' }}"></i>
+                                </button>
+                            </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    <div id="picPasangHidden"></div>
+                </div>
+
+                <!-- Remark Pemasangan -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Remark Pemasangan</label>
+                    <textarea name="remark_pemasangan" rows="2"
+                              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none"
+                              placeholder="Catatan tambahan...">{{ old('remark_pemasangan', $work_order->remark_pemasangan) }}</textarea>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+                    <button type="button" onclick="closeInstallModal()"
+                            class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25">
+                        <i class="fas fa-save mr-2"></i> Simpan Pemasangan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// ===================== INSTALL MODAL =====================
+function openInstallModal() {
+    const overlay = document.getElementById('installModalOverlay');
+    const box = document.getElementById('installModalBox');
+    box.style.maxHeight = Math.floor(window.innerHeight * 0.88) + 'px';
+    overlay.classList.remove('hidden');
+    overlay.onclick = function(e) {
+        if (e.target === overlay) closeInstallModal();
+    };
+    document.body.style.overflow = 'hidden';
+}
+function closeInstallModal() {
+    document.getElementById('installModalOverlay').classList.add('hidden');
+    document.getElementById('picPasangDropdown')?.classList.add('hidden');
+    document.getElementById('picPasangChevron')?.classList.remove('rotate-180');
+    document.getElementById('machineDropdown')?.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+@if($errors->any() && old('_token') && request()->is('*install*'))
+document.addEventListener('DOMContentLoaded', openInstallModal);
+@endif
+
+// ===================== MACHINE SEARCH =====================
+function machineFilter(q) {
+    const lq = q.toLowerCase();
+    document.querySelectorAll('.machine-option').forEach(opt => {
+        opt.style.display = opt.dataset.mach.includes(lq) ? '' : 'none';
+    });
+}
+function machineDropdownShow() {
+    document.getElementById('machineDropdown')?.classList.remove('hidden');
+}
+function selectMachine(id, machNumber, machType) {
+    document.getElementById('installMachineId').value = id;
+    document.getElementById('machineSearchInput').value = machNumber + ' — ' + machType;
+    document.getElementById('machineDropdown').classList.add('hidden');
+}
+document.addEventListener('click', function(e) {
+    const wrapper = document.getElementById('machineSearchWrapper');
+    const dd = document.getElementById('machineDropdown');
+    if (dd && !dd.classList.contains('hidden') && wrapper && !wrapper.contains(e.target)) {
+        dd.classList.add('hidden');
+    }
+});
+
+// ===================== PIC PASANG MULTI-SELECT =====================
+const picPasangSelected = new Map();
+@foreach($users as $u)
+@if(in_array($u->id, $picPasangIdsOld))
+picPasangSelected.set({{ $u->id }}, '{{ addslashes($u->name) }}');
+@endif
+@endforeach
+
+function picPasangRender() {
+    const tagsBox   = document.getElementById('picPasangTags');
+    const placeholder = document.getElementById('picPasangPlaceholder');
+    const hiddenBox = document.getElementById('picPasangHidden');
+    tagsBox.querySelectorAll('.pic-pasang-tag').forEach(t => t.remove());
+    if (picPasangSelected.size > 0) {
+        placeholder?.classList.add('hidden');
+        picPasangSelected.forEach((name, id) => {
+            const tag = document.createElement('span');
+            tag.className = 'pic-pasang-tag inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-xs font-medium px-2.5 py-1 rounded-full';
+            tag.innerHTML = `${name} <button type="button" onclick="event.stopPropagation();picPasangRemove(${id})" class="ml-0.5 text-emerald-600 hover:text-emerald-900 leading-none font-bold">&times;</button>`;
+            tagsBox.appendChild(tag);
+        });
+    } else {
+        placeholder?.classList.remove('hidden');
+    }
+    hiddenBox.innerHTML = '';
+    picPasangSelected.forEach((name, id) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'pic_pasang[]';
+        input.value = id;
+        hiddenBox.appendChild(input);
+    });
+}
+function picPasangToggleDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('picPasangDropdown');
+    const chevron  = document.getElementById('picPasangChevron');
+    const isHidden = dropdown.classList.contains('hidden');
+    if (isHidden) {
+        dropdown.classList.remove('hidden');
+        chevron?.classList.add('rotate-180');
+        const search = document.getElementById('picPasangSearch');
+        if (search) { search.value = ''; picPasangFilter(''); setTimeout(() => search.focus(), 50); }
+    } else {
+        dropdown.classList.add('hidden');
+        chevron?.classList.remove('rotate-180');
+    }
+}
+document.addEventListener('click', function(e) {
+    const wrapper  = document.getElementById('picPasangWrapper');
+    const dropdown = document.getElementById('picPasangDropdown');
+    if (!dropdown || dropdown.classList.contains('hidden')) return;
+    if (!wrapper || !wrapper.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        document.getElementById('picPasangChevron')?.classList.remove('rotate-180');
+    }
+});
+function picPasangToggleUser(id, name) {
+    const btn   = document.getElementById('picPasangBtn_' + id);
+    const check = document.getElementById('picPasangCheck_' + id);
+    if (picPasangSelected.has(id)) {
+        picPasangSelected.delete(id);
+        check?.classList.add('invisible');
+        btn?.classList.remove('bg-emerald-50', 'text-emerald-800', 'font-medium');
+        btn?.classList.add('text-slate-700');
+    } else {
+        picPasangSelected.set(id, name);
+        check?.classList.remove('invisible');
+        btn?.classList.add('bg-emerald-50', 'text-emerald-800', 'font-medium');
+        btn?.classList.remove('text-slate-700');
+    }
+    picPasangRender();
+}
+function picPasangRemove(id) {
+    picPasangSelected.delete(id);
+    document.getElementById('picPasangCheck_' + id)?.classList.add('invisible');
+    const btn = document.getElementById('picPasangBtn_' + id);
+    btn?.classList.remove('bg-emerald-50', 'text-emerald-800', 'font-medium');
+    btn?.classList.add('text-slate-700');
+    picPasangRender();
+}
+function picPasangFilter(q) {
+    document.querySelectorAll('.pic-pasang-item').forEach(item => {
+        item.style.display = item.dataset.name.includes(q.toLowerCase()) ? '' : 'none';
+    });
+}
+document.addEventListener('DOMContentLoaded', picPasangRender);
 </script>
 
 </x-layouts.app>

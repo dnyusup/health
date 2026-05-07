@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('work-orders', AssyWorkOrderController::class);
     Route::get('work-orders-export', [AssyWorkOrderController::class, 'exportExcel'])->name('work-orders.export');
     Route::post('work-orders/{work_order}/repair', [AssyWorkOrderController::class, 'repair'])->name('work-orders.repair');
+    Route::post('work-orders/{work_order}/install', [AssyWorkOrderController::class, 'install'])->name('work-orders.install');
     Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
 
     // Ready Stock

@@ -84,9 +84,10 @@ class AssyWorkOrderController extends Controller
 
     public function show(AssyWorkOrder $work_order)
     {
-        $work_order->load(['machine', 'pic', 'creator', 'repairedBy']);
-        $users = User::orderBy('name')->get(['id', 'name']);
-        return view('work-orders.show', compact('work_order', 'users'));
+        $work_order->load(['machine', 'pic', 'creator', 'repairedBy', 'installedBy']);
+        $users    = User::orderBy('name')->get(['id', 'name']);
+        $machines = AssyMachine::orderBy('mach_number')->get(['id', 'mach_number', 'mach_type']);
+        return view('work-orders.show', compact('work_order', 'users', 'machines'));
     }
 
     public function edit(AssyWorkOrder $work_order)
@@ -103,7 +104,7 @@ class AssyWorkOrderController extends Controller
             'order_type'      => 'required|in:ZSPM,ZSBM',
             'machine_id'      => 'required|exists:assy_machines,id',
             'pic_bongkar'     => 'required|exists:users,id',
-            'status'          => 'required|in:Open,On Progress,Closed',
+            'status'          => 'required|in:Open,On Progress,Closed,Installed',
         ]);
 
         $machine = AssyMachine::findOrFail($request->machine_id);
@@ -146,8 +147,7 @@ class AssyWorkOrderController extends Controller
             'pic_assembling'     => 'required|array|min:1',
             'pic_assembling.*'   => 'exists:users,id',
             'remark_assembling'  => 'nullable|string|max:1000',
-            'status'             => 'required|in:Open,On Progress,Closed',
-            'foto_kerusakan'     => 'nullable|image|max:5120',
+            'status'             => 'required|in:Open,On Progress,Closed,Installed',
         ]);
 
         $data = [
@@ -172,6 +172,36 @@ class AssyWorkOrderController extends Controller
 
         return redirect()->route('work-orders.show', $work_order)
             ->with('success', 'Data repair berhasil disimpan.');
+    }
+
+    public function install(Request $request, AssyWorkOrder $work_order)
+    {
+        $request->validate([
+            'tanggal_pasang'   => 'required|date',
+            'install_machine_id' => 'required|exists:assy_machines,id',
+            'install_pos'      => 'nullable|string|max:50',
+            'pic_pasang'       => 'required|array|min:1',
+            'pic_pasang.*'     => 'exists:users,id',
+            'remark_pemasangan' => 'nullable|string|max:1000',
+        ]);
+
+        $machine = AssyMachine::findOrFail($request->install_machine_id);
+
+        $work_order->update([
+            'tanggal_pasang'     => $request->tanggal_pasang,
+            'install_machine_id' => $request->install_machine_id,
+            'install_mach_number' => $machine->mach_number,
+            'install_mach_type'  => $machine->mach_type,
+            'install_pos'        => $request->install_pos,
+            'pic_pasang'         => $request->pic_pasang,
+            'remark_pemasangan'  => $request->remark_pemasangan,
+            'installed_by'       => auth()->id(),
+            'installed_at'       => now(),
+            'status'             => 'Installed',
+        ]);
+
+        return redirect()->route('work-orders.show', $work_order)
+            ->with('success', 'Data pemasangan berhasil disimpan.');
     }
 
     public function exportExcel(AssyWorkOrderExcelService $service)

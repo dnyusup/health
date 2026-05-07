@@ -33,6 +33,16 @@ class AssyWorkOrder extends Model
         'foto_kerusakan',
         'repaired_by',
         'repaired_at',
+        // install fields
+        'tanggal_pasang',
+        'install_machine_id',
+        'install_mach_number',
+        'install_mach_type',
+        'install_pos',
+        'pic_pasang',
+        'remark_pemasangan',
+        'installed_by',
+        'installed_at',
     ];
 
     protected $casts = [
@@ -40,6 +50,9 @@ class AssyWorkOrder extends Model
         'tanggal_assembling' => 'date',
         'pic_assembling'     => 'array',
         'repaired_at'        => 'datetime',
+        'tanggal_pasang'     => 'date',
+        'pic_pasang'         => 'array',
+        'installed_at'       => 'datetime',
     ];
 
     public function machine()
@@ -60,5 +73,10 @@ class AssyWorkOrder extends Model
     public function repairedBy()
     {
         return $this->belongsTo(User::class, 'repaired_by');
+    }
+
+    public function installedBy()
+    {
+        return $this->belongsTo(User::class, 'installed_by');
     }
 }
