@@ -231,10 +231,10 @@
 
     <!-- ===================== REPAIR MODAL ===================== -->
     <div id="repairModalOverlay"
-         class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50">
+         class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 overflow-hidden">
         <!-- Inner: stops propagation so clicking modal doesn't close -->
         <div class="relative bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl
-                    flex flex-col max-h-[92dvh] sm:max-h-[90dvh]"
+                    flex flex-col max-h-[88vh] sm:max-h-[90vh]"
              id="repairModalBox"
              onclick="event.stopPropagation()">
             <!-- Modal Header -->
