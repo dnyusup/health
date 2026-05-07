@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AssyWorkOrder;
+use App\Models\User;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
@@ -17,31 +18,65 @@ class AssyWorkOrderExcelService
         $sheet->setTitle('Work Orders');
 
         $headers = [
+            // Pembongkaran
             'Tanggal Bongkar', 'Order Number', 'Order Type',
             'Mach Number', 'Mach Type', 'Pos',
             'Part ID', 'Part Name', 'Category', 'Part Detail',
-            'Kerusakan', 'PIC Bongkar', 'Remark', 'Status', 'Created By', 'Created On',
+            'Kerusakan', 'PIC Bongkar', 'Remark', 'Status',
+            'Created By', 'Created On',
+            // Repair / Assembling
+            'Tgl Assembling', 'Action Assembling', 'PIC Assembling',
+            'Remark Assembling', 'Repaired By', 'Repaired At',
+            // Pemasangan / Install
+            'Tgl Pasang', 'Mesin Install', 'Type Install', 'Pos Install',
+            'PIC Pasang', 'Remark Pemasangan', 'Installed By', 'Installed At',
         ];
 
         foreach ($headers as $col => $header) {
             $sheet->setCellValue(chr(65 + $col) . '1', $header);
         }
 
-        $headerStyle = [
+        // Section header colors
+        $blueStyle = [
             'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1D4ED8']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ];
-        $lastCol = chr(65 + count($headers) - 1);
-        $sheet->getStyle("A1:{$lastCol}1")->applyFromArray($headerStyle);
+        $amberStyle = [
+            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D97706']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ];
+        $emeraldStyle = [
+            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '059669']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ];
 
-        $colWidths = [18, 18, 12, 15, 12, 8, 12, 30, 25, 30, 25, 15, 25, 10, 15, 22];
+        $sheet->getStyle('A1:P1')->applyFromArray($blueStyle);
+        $sheet->getStyle('Q1:V1')->applyFromArray($amberStyle);
+        $sheet->getStyle('W1:AD1')->applyFromArray($emeraldStyle);
+
+        $colWidths = [
+            18, 18, 12, 15, 12, 8, 12, 30, 25, 30, 25, 20, 25, 12, 20, 22,
+            18, 40, 35, 30, 20, 22,
+            18, 15, 12, 10, 35, 30, 20, 22,
+        ];
         foreach ($colWidths as $i => $w) {
             $sheet->getColumnDimension(chr(65 + $i))->setWidth($w);
         }
 
+        // Pre-load all users into a map id -> name for pic_assembling / pic_pasang lookups
+        $userMap = User::pluck('name', 'id')->toArray();
+
+        $resolvePicNames = function (?array $ids) use ($userMap): string {
+            if (empty($ids)) return '';
+            return implode(', ', array_map(fn($id) => $userMap[$id] ?? "#{$id}", $ids));
+        };
+
         $row = 2;
-        foreach (AssyWorkOrder::with(['pic', 'creator'])->cursor() as $wo) {
+        foreach (AssyWorkOrder::with(['pic', 'creator', 'repairedBy', 'installedBy'])->cursor() as $wo) {
+            // Pembongkaran
             $sheet->setCellValue('A' . $row, $wo->tanggal_bongkar?->format('m/d/Y'));
             $sheet->setCellValue('B' . $row, $wo->order_number);
             $sheet->setCellValue('C' . $row, $wo->order_type);
@@ -58,6 +93,22 @@ class AssyWorkOrderExcelService
             $sheet->setCellValue('N' . $row, $wo->status);
             $sheet->setCellValue('O' . $row, $wo->creator->name ?? '');
             $sheet->setCellValue('P' . $row, $wo->created_at?->format('m/d/Y H:i:s'));
+            // Repair / Assembling
+            $sheet->setCellValue('Q' . $row, $wo->tanggal_assembling?->format('m/d/Y'));
+            $sheet->setCellValue('R' . $row, $wo->action_assembling);
+            $sheet->setCellValue('S' . $row, $resolvePicNames($wo->pic_assembling));
+            $sheet->setCellValue('T' . $row, $wo->remark_assembling);
+            $sheet->setCellValue('U' . $row, $wo->repairedBy->name ?? '');
+            $sheet->setCellValue('V' . $row, $wo->repaired_at?->format('m/d/Y H:i:s'));
+            // Pemasangan / Install
+            $sheet->setCellValue('W' . $row, $wo->tanggal_pasang?->format('m/d/Y'));
+            $sheet->setCellValue('X' . $row, $wo->install_mach_number);
+            $sheet->setCellValue('Y' . $row, $wo->install_mach_type);
+            $sheet->setCellValue('Z' . $row, $wo->install_pos);
+            $sheet->setCellValue('AA' . $row, $resolvePicNames($wo->pic_pasang));
+            $sheet->setCellValue('AB' . $row, $wo->remark_pemasangan);
+            $sheet->setCellValue('AC' . $row, $wo->installedBy->name ?? '');
+            $sheet->setCellValue('AD' . $row, $wo->installed_at?->format('m/d/Y H:i:s'));
             $row++;
         }
 
