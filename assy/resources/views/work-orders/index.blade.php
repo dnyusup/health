@@ -215,7 +215,7 @@
         <form action="{{ route('work-orders.import') }}" method="POST" enctype="multipart/form-data" class="px-6 py-5 space-y-4">
             @csrf
             <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700">
-                <p><i class="fas fa-info-circle mr-1"></i> Gunakan file <strong>Export Excel</strong> sebagai template. Kolom auto (Mach Type, Status, Created By/On, Repaired By/At, Installed By/At, Type Install) tidak perlu diisi.</p>
+                <p><i class="fas fa-info-circle mr-1"></i> Gunakan file <strong>Export Excel</strong> sebagai template. Kolom auto (Mach Type, Created By/On, Repaired By/At, Installed By/At, Type Install) tidak perlu diisi. Status akan dibaca dari kolom N.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">File Excel <span class="text-red-500">*</span></label>
