@@ -1,5 +1,6 @@
 <x-layouts.app>
     <x-slot:title>Users</x-slot:title>
+    <x-slot:header>User Management</x-slot:header>
     
     <div class="space-y-6">
                 <!-- Filter & Search -->

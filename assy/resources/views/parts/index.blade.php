@@ -1,5 +1,6 @@
 <x-layouts.app>
     <x-slot:title>Part Registration</x-slot:title>
+    <x-slot:header>Part Registration</x-slot:header>
 
     <div class="space-y-6">
         <!-- Filter & Search -->
