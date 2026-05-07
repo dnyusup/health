@@ -55,16 +55,12 @@
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Tgl Assembling</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Order Number</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part ID</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Name</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Detail</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Mach Number</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Action</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">PIC Assembling</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Foto</th>
                             <th class="px-3 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">Detail</th>
                         </tr>
                     </thead>
@@ -81,18 +77,6 @@
                             <td class="px-3 py-3 text-slate-600">
                                 {{ $wo->tanggal_assembling?->format('d/m/Y') ?? '-' }}
                             </td>
-                            <td class="px-3 py-3">
-                                <a href="{{ route('work-orders.show', $wo) }}"
-                                   class="font-semibold text-blue-600 hover:text-blue-800 hover:underline">
-                                    {{ $wo->order_number ?: '-' }}
-                                </a>
-                            </td>
-                            <td class="px-3 py-3">
-                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold
-                                    {{ $wo->order_type === 'ZSPM' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700' }}">
-                                    {{ $wo->order_type }}
-                                </span>
-                            </td>
                             <td class="px-3 py-3 font-mono text-slate-700">{{ $wo->part_id ?: '-' }}</td>
                             <td class="px-3 py-3 text-slate-800 font-medium max-w-[180px] truncate" title="{{ $wo->part_name }}">
                                 {{ $wo->part_name ?: '-' }}
@@ -101,7 +85,6 @@
                             <td class="px-3 py-3 text-slate-500 max-w-[140px] truncate" title="{{ $wo->part_detail }}">
                                 {{ $wo->part_detail ?: '-' }}
                             </td>
-                            <td class="px-3 py-3 font-medium text-slate-700">{{ $wo->mach_number ?: '-' }}</td>
                             <td class="px-3 py-3 max-w-[180px] truncate text-slate-700" title="{{ $wo->action_assembling }}">
                                 {{ $wo->action_assembling ?: '-' }}
                             </td>
@@ -116,16 +99,6 @@
                                     @endforelse
                                 </div>
                             </td>
-                            <td class="px-3 py-3">
-                                @if($wo->foto_kerusakan)
-                                <a href="{{ route('storage.serve', $wo->foto_kerusakan) }}" target="_blank">
-                                    <img src="{{ route('storage.serve', $wo->foto_kerusakan) }}"
-                                         class="h-10 w-10 object-cover rounded-lg border border-slate-200 hover:opacity-80 transition-opacity">
-                                </a>
-                                @else
-                                <span class="text-slate-300 text-xs">-</span>
-                                @endif
-                            </td>
                             <td class="px-3 py-3 text-center">
                                 <a href="{{ route('work-orders.show', $wo) }}"
                                    class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all">
@@ -135,7 +108,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="12" class="px-6 py-16 text-center">
+                            <td colspan="8" class="px-6 py-16 text-center">
                                 <div class="flex flex-col items-center gap-3 text-slate-400">
                                     <i class="fas fa-box-open text-4xl"></i>
                                     <p class="font-medium">Belum ada part ready stock</p>
