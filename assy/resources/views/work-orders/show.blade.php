@@ -230,17 +230,15 @@
     </div>
 
     <!-- ===================== REPAIR MODAL ===================== -->
-    <!-- Overlay: scrollable container -->
     <div id="repairModalOverlay"
-         class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 backdrop-blur-sm">
-        <!-- Inner wrapper: bottom sheet mobile / centered desktop, handles outside click -->
-        <div class="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4"
-             onclick="handleOverlayClick(event)">
-        <div class="bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl"
+         class="fixed inset-0 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50">
+        <!-- Inner: stops propagation so clicking modal doesn't close -->
+        <div class="relative bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl
+                    flex flex-col max-h-[92dvh] sm:max-h-[90dvh]"
              id="repairModalBox"
              onclick="event.stopPropagation()">
             <!-- Modal Header -->
-            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 flex-shrink-0">
                 <div>
                     <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <i class="fas fa-tools text-amber-500"></i> Form Repair / Assembling
@@ -252,9 +250,9 @@
                 </button>
             </div>
 
-            <!-- Form -->
+            <!-- Form (scrollable) (scrollable) -->
             <form action="{{ route('work-orders.repair', $work_order) }}" method="POST"
-                  enctype="multipart/form-data" class="px-6 py-5 space-y-5">
+                  enctype="multipart/form-data" class="px-6 py-5 space-y-5 overflow-y-auto flex-1">
                 @csrf
 
                 <!-- Tanggal Assembling -->
@@ -394,32 +392,31 @@
                 </div>
             </form>
         </div>
-        </div>
-    </div>
 
-    <!-- Closed confirmation dialog (hidden) -->
-    <div id="closedConfirmOverlay"
-         class="fixed inset-0 z-[60] hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
-                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+        <!-- Closed confirmation — absolute over modal box, no stacking context issues -->
+        <div id="closedConfirmOverlay"
+             class="hidden absolute inset-0 z-10 bg-black/60 rounded-t-2xl sm:rounded-2xl flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
+                        <i class="fas fa-exclamation-triangle text-red-500"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-slate-800">Konfirmasi Close</h4>
+                        <p class="text-sm text-slate-500">Work order akan ditutup permanen.</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold text-slate-800">Konfirmasi Close</h4>
-                    <p class="text-sm text-slate-500">Work order akan ditutup permanen.</p>
+                <p class="text-sm text-slate-600">Yakin ingin mengubah status menjadi <strong>Closed</strong>? Pastikan semua pekerjaan sudah selesai.</p>
+                <div class="flex gap-3">
+                    <button type="button" onclick="cancelClose()"
+                            class="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
+                        Batal
+                    </button>
+                    <button type="button" onclick="confirmClose()"
+                            class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all">
+                        Ya, Close
+                    </button>
                 </div>
-            </div>
-            <p class="text-sm text-slate-600">Yakin ingin mengubah status menjadi <strong>Closed</strong>? Pastikan semua pekerjaan sudah selesai.</p>
-            <div class="flex gap-3">
-                <button onclick="cancelClose()"
-                        class="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
-                    Batal
-                </button>
-                <button onclick="confirmClose()"
-                        class="flex-1 px-4 py-2.5 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all">
-                    Ya, Close
-                </button>
             </div>
         </div>
     </div>
@@ -427,7 +424,11 @@
 <script>
 // ===================== MODAL OPEN/CLOSE =====================
 function openRepairModal() {
-    document.getElementById('repairModalOverlay').classList.remove('hidden');
+    const overlay = document.getElementById('repairModalOverlay');
+    overlay.classList.remove('hidden');
+    overlay.onclick = function(e) {
+        if (e.target === overlay) closeRepairModal();
+    };
     document.body.style.overflow = 'hidden';
 }
 function closeRepairModal() {
@@ -435,10 +436,6 @@ function closeRepairModal() {
     document.getElementById('picAsmDropdown')?.classList.add('hidden');
     document.getElementById('picAsmChevron')?.classList.remove('rotate-180');
     document.body.style.overflow = '';
-}
-function handleOverlayClick(e) {
-    // The inner wrapper calls this; clicking the wrapper (outside modal box) closes it
-    closeRepairModal();
 }
 // Auto-open if validation errors
 @if($errors->any())
