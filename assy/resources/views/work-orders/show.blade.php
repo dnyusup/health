@@ -216,11 +216,15 @@
     </div>
 
     <!-- ===================== REPAIR MODAL ===================== -->
+    <!-- Overlay: scrollable container -->
     <div id="repairModalOverlay"
-         class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-         onclick="handleOverlayClick(event)">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-             id="repairModalBox">
+         class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 backdrop-blur-sm">
+        <!-- Inner wrapper: bottom sheet mobile / centered desktop, handles outside click -->
+        <div class="flex min-h-full items-end sm:items-center justify-center p-0 sm:p-4"
+             onclick="handleOverlayClick(event)">
+        <div class="bg-white w-full max-w-2xl rounded-t-2xl sm:rounded-2xl shadow-2xl"
+             id="repairModalBox"
+             onclick="event.stopPropagation()">
             <!-- Modal Header -->
             <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 sticky top-0 bg-white rounded-t-2xl z-10">
                 <div>
@@ -283,7 +287,7 @@
                                    oninput="picAsmFilter(this.value)"
                                    class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
                         </div>
-                        <ul id="picAsmList" class="max-h-48 overflow-y-auto divide-y divide-slate-50">
+                        <ul id="picAsmList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
                             @foreach($users as $u)
                             <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
                                 <button type="button"
@@ -358,6 +362,7 @@
                 </div>
             </form>
         </div>
+        </div>
     </div>
 
     <!-- Closed confirmation dialog (hidden) -->
@@ -400,9 +405,8 @@ function closeRepairModal() {
     document.body.style.overflow = '';
 }
 function handleOverlayClick(e) {
-    if (e.target === document.getElementById('repairModalOverlay')) {
-        closeRepairModal();
-    }
+    // The inner wrapper calls this; clicking the wrapper (outside modal box) closes it
+    closeRepairModal();
 }
 // Auto-open if validation errors
 @if($errors->any())
