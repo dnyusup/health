@@ -257,10 +257,13 @@
 
                 <!-- Action -->
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">Action</label>
-                    <textarea name="action_assembling" rows="2"
-                              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none"
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Action <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="action_assembling" rows="2" required
+                              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all resize-none @error('action_assembling') border-red-500 @enderror"
                               placeholder="Deskripsikan tindakan yang dilakukan...">{{ old('action_assembling', $work_order->action_assembling) }}</textarea>
+                    @error('action_assembling') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- PIC Assembling: inline collapsible dropdown -->
@@ -327,12 +330,27 @@
                         <span class="text-xs text-slate-500">Foto saat ini. Upload baru untuk mengganti.</span>
                     </div>
                     @endif
-                    <label class="flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-all">
-                        <i class="fas fa-camera text-slate-400 text-lg"></i>
-                        <span id="fotoLabel" class="text-sm text-slate-500">Pilih foto...</span>
-                        <input type="file" name="foto_kerusakan" accept="image/*" class="hidden"
-                               onchange="updateFotoLabel(this)">
-                    </label>
+
+                    <!-- Hidden file input (used by both buttons) -->
+                    <input type="file" id="fotoInput" name="foto_kerusakan" accept="image/*" class="hidden"
+                           onchange="updateFotoLabel(this)">
+                    <!-- Hidden camera input -->
+                    <input type="file" id="fotoCamera" name="foto_kerusakan" accept="image/*" capture="environment" class="hidden"
+                           onchange="updateFotoLabel(this)">
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <label for="fotoInput"
+                               class="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-all text-center">
+                            <i class="fas fa-image text-slate-400 text-xl"></i>
+                            <span class="text-xs text-slate-500 font-medium">Upload File</span>
+                        </label>
+                        <label for="fotoCamera"
+                               class="flex flex-col items-center gap-1.5 px-3 py-3 rounded-xl border-2 border-dashed border-slate-200 hover:border-amber-400 cursor-pointer transition-all text-center">
+                            <i class="fas fa-camera text-slate-400 text-xl"></i>
+                            <span class="text-xs text-slate-500 font-medium">Kamera</span>
+                        </label>
+                    </div>
+                    <p id="fotoLabel" class="mt-1.5 text-xs text-slate-400 truncate"></p>
                     @error('foto_kerusakan') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
@@ -534,7 +552,17 @@ document.addEventListener('DOMContentLoaded', picAsmRender);
 // ===================== FOTO LABEL =====================
 function updateFotoLabel(input) {
     const lbl = document.getElementById('fotoLabel');
-    lbl.textContent = input.files[0]?.name || 'Pilih foto...';
+    if (input.files[0]) {
+        lbl.textContent = input.files[0].name;
+        // Sync: copy the chosen file to the other input so only 1 named input submits
+        // We rename both to 'foto_kerusakan' but only the last-changed matters;
+        // simpler: disable the other input so form doesn't send an empty file field
+        const other = input.id === 'fotoInput' ? document.getElementById('fotoCamera') : document.getElementById('fotoInput');
+        other.disabled = true;
+        input.disabled = false;
+    } else {
+        lbl.textContent = '';
+    }
 }
 </script>
 

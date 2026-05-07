@@ -141,7 +141,7 @@ class AssyWorkOrderController extends Controller
     {
         $request->validate([
             'tanggal_assembling' => 'required|date',
-            'action_assembling'  => 'nullable|string|max:1000',
+            'action_assembling'  => 'required|string|max:1000',
             'pic_assembling'     => 'required|array|min:1',
             'pic_assembling.*'   => 'exists:users,id',
             'remark_assembling'  => 'nullable|string|max:1000',
