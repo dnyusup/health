@@ -221,18 +221,6 @@ class AssyWorkOrderController extends Controller
         exit;
     }
 
-    public function importTemplate(AssyWorkOrderExcelService $service)
-    {
-        if (!auth()->user()->isAdmin()) {
-            abort(403);
-        }
-        ini_set('memory_limit', '256M');
-        set_time_limit(120);
-        ob_end_clean();
-        $service->exportTemplate();
-        exit;
-    }
-
     public function importExcel(Request $request, AssyWorkOrderExcelService $service)
     {
         if (!auth()->user()->isAdmin()) {

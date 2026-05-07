@@ -58,10 +58,6 @@
                     <i class="fas fa-file-excel"></i> Export Excel
                 </a>
                 @if(auth()->user()->isAdmin())
-                <a href="{{ route('work-orders.import-template') }}"
-                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-xl font-medium hover:bg-violet-100 transition-all">
-                    <i class="fas fa-download"></i> Download Template
-                </a>
                 <button type="button" onclick="document.getElementById('importWOModal').classList.remove('hidden')"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium hover:bg-amber-100 transition-all">
                     <i class="fas fa-file-upload"></i> Import Excel
@@ -218,9 +214,8 @@
         </div>
         <form action="{{ route('work-orders.import') }}" method="POST" enctype="multipart/form-data" class="px-6 py-5 space-y-4">
             @csrf
-            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700 space-y-1">
-                <p><i class="fas fa-info-circle mr-1"></i> Gunakan template yang disediakan agar format sesuai.</p>
-                <p>Download template: <a href="{{ route('work-orders.import-template') }}" class="font-medium underline">assy_work_orders_import_template.xlsx</a></p>
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700">
+                <p><i class="fas fa-info-circle mr-1"></i> Gunakan file <strong>Export Excel</strong> sebagai template. Kolom auto (Mach Type, Status, Created By/On, Repaired By/At, Installed By/At, Type Install) tidak perlu diisi.</p>
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-2">File Excel <span class="text-red-500">*</span></label>

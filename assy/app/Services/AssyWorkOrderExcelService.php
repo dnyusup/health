@@ -131,152 +131,11 @@ class AssyWorkOrderExcelService
         unset($spreadsheet);
     }
 
-    /**
-     * Download import template with column instructions.
-     * Required columns = blue header, auto columns = gray header.
-     */
-    public function exportTemplate(): void
-    {
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Import Template');
-
-        // Row 1: column type label (WAJIB / AUTO)
-        // Row 2: column name header
-        // Row 3+: sample data row
-
-        $columns = [
-            // [header, type, sampleValue]
-            // type: 'required' | 'auto'
-            ['Tanggal Bongkar',   'required', '31/12/2026'],
-            ['Order Number',      'optional', 'WO-001'],
-            ['Order Type',        'required', 'ZSPM'],
-            ['Mach Number',       'required', 'ISC-1'],
-            ['Pos',               'optional', '1'],
-            ['Part ID',           'optional', 'S171'],
-            ['Part Name',         'optional', 'Screw Pump WAP'],
-            ['Category',          'optional', 'Screw Pump'],
-            ['Part Detail',       'optional', '0.4 Kw'],
-            ['Kerusakan',         'optional', 'Bearing rusak'],
-            ['PIC Bongkar (Nama)','required', 'DENI YUSUP'],
-            ['Remark',            'optional', ''],
-            // Repair
-            ['Tgl Assembling',    'optional', '01/01/2027'],
-            ['Action Assembling', 'optional', 'Ganti bearing'],
-            ['PIC Assembling (Nama)', 'optional', 'ADI ISKANDAR, RADENAL TRINOVA'],
-            ['Remark Assembling', 'optional', ''],
-            // Install
-            ['Tgl Pasang',        'optional', '05/01/2027'],
-            ['Mesin Install',     'optional', 'ISC-2'],
-            ['Pos Install',       'optional', '3'],
-            ['PIC Pasang (Nama)', 'optional', 'ADI ISKANDAR'],
-            ['Remark Pemasangan', 'optional', ''],
-        ];
-
-        $requiredStyle = [
-            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1D4ED8']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ];
-        $optionalStyle = [
-            'font'      => ['bold' => true, 'color' => ['rgb' => '374151']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E5E7EB']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ];
-        $sectionRepairStyle = [
-            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'D97706']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ];
-        $sectionInstallStyle = [
-            'font'      => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '059669']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-        ];
-
-        // Row 1: type label | Row 2: column name | Row 3: sample
-        foreach ($columns as $i => $col) {
-            $colLetter = Coordinate::stringFromColumnIndex($i + 1);
-            $typeLabel = $col[1] === 'required' ? '★ WAJIB DIISI' : 'opsional';
-            $sheet->setCellValue($colLetter . '1', $typeLabel);
-            $sheet->setCellValue($colLetter . '2', $col[0]);
-            $sheet->setCellValue($colLetter . '3', $col[2]);
-
-            // Style row 1 (type indicator)
-            if ($col[1] === 'required') {
-                $sheet->getStyle($colLetter . '1')->applyFromArray($requiredStyle);
-            } else {
-                $sheet->getStyle($colLetter . '1')->applyFromArray($optionalStyle);
-            }
-
-            // Style row 2 (section colors)
-            if ($i <= 11) {
-                // Pembongkaran section — blue
-                $sheet->getStyle($colLetter . '2')->applyFromArray($requiredStyle);
-            } elseif ($i <= 15) {
-                // Repair section — amber
-                $sheet->getStyle($colLetter . '2')->applyFromArray($sectionRepairStyle);
-            } else {
-                // Install section — green
-                $sheet->getStyle($colLetter . '2')->applyFromArray($sectionInstallStyle);
-            }
-
-            $sheet->getColumnDimension($colLetter)->setWidth(22);
-        }
-
-        // Freeze rows 1-2
-        $sheet->freezePane('A3');
-        $sheet->getRowDimension(1)->setRowHeight(18);
-        $sheet->getRowDimension(2)->setRowHeight(18);
-
-        // Auto-generated columns legend in a second sheet
-        $infoSheet = $spreadsheet->createSheet();
-        $infoSheet->setTitle('Keterangan');
-        $infoSheet->setCellValue('A1', 'Keterangan Import Work Order');
-        $infoSheet->setCellValue('A3', '★ WAJIB DIISI');
-        $infoSheet->setCellValue('B3', 'Kolom harus diisi, baris akan diskip jika kosong');
-        $infoSheet->setCellValue('A4', 'opsional');
-        $infoSheet->setCellValue('B4', 'Kolom boleh kosong');
-        $infoSheet->setCellValue('A6', 'Kolom AUTO (tidak perlu diisi):');
-        $infoSheet->setCellValue('A7', '- Status');
-        $infoSheet->setCellValue('B7', 'Otomatis: Open (jika tgl_assembling kosong), On Progress/Closed (dari data assembling)');
-        $infoSheet->setCellValue('A8', '- Mach Type');
-        $infoSheet->setCellValue('B8', 'Otomatis diambil dari Mach Number yang terdaftar di sistem');
-        $infoSheet->setCellValue('A9', '- Mesin Type Install');
-        $infoSheet->setCellValue('B9', 'Otomatis diambil dari Mesin Install yang terdaftar di sistem');
-        $infoSheet->setCellValue('A10', '- Created By / Created On');
-        $infoSheet->setCellValue('B10', 'Otomatis: user yang melakukan import & waktu import');
-        $infoSheet->setCellValue('A11', '- Repaired By / Repaired At');
-        $infoSheet->setCellValue('B11', 'Otomatis: user yang melakukan import & waktu import (jika ada data assembling)');
-        $infoSheet->setCellValue('A12', '- Installed By / Installed At');
-        $infoSheet->setCellValue('B12', 'Otomatis: user yang melakukan import & waktu import (jika ada data pemasangan)');
-        $infoSheet->setCellValue('A14', 'Format Tanggal: DD/MM/YYYY (contoh: 31/12/2026)');
-        $infoSheet->setCellValue('A15', 'Order Type yang valid: ZSPM atau ZSBM');
-        $infoSheet->setCellValue('A16', 'PIC Bongkar / PIC Assembling / PIC Pasang: isi dengan nama lengkap user (case-insensitive), pisahkan dengan koma jika lebih dari satu');
-        $infoSheet->getColumnDimension('A')->setWidth(30);
-        $infoSheet->getColumnDimension('B')->setWidth(80);
-        $infoSheet->getStyle('A1')->applyFromArray(['font' => ['bold' => true, 'size' => 13]]);
-        $infoSheet->getStyle('A3:A12')->applyFromArray(['font' => ['bold' => true]]);
-
-        $spreadsheet->setActiveSheetIndex(0);
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->setPreCalculateFormulas(false);
-
-        $filename = 'assy_work_orders_import_template.xlsx';
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        $writer->save('php://output');
-
-        $spreadsheet->disconnectWorksheets();
-        unset($spreadsheet);
-    }
 
     /**
-     * Import work orders from Excel.
-     * Reads rows starting from row 3 (row1=type, row2=header).
+     * Import work orders from Excel export format.
+     * Row 1 = header (A=Tanggal Bongkar … AD=Installed At).
+     * Data starts from row 2.
      * PIC fields resolved by name (case-insensitive).
      *
      * @return array{inserted: int, skipped: int, errors: array}
@@ -291,8 +150,8 @@ class AssyWorkOrderExcelService
         $worksheet   = $spreadsheet->getActiveSheet();
         $highestRow  = $worksheet->getHighestDataRow();
 
-        if ($highestRow < 3) {
-            $stats['errors'][] = 'File kosong atau tidak ada data (mulai dari baris 3).';
+        if ($highestRow < 2) {
+            $stats['errors'][] = 'File kosong atau tidak ada data (mulai dari baris 2).';
             $spreadsheet->disconnectWorksheets();
             return $stats;
         }
@@ -351,13 +210,21 @@ class AssyWorkOrderExcelService
         $batchInsert = [];
         $processed   = 0;
 
-        for ($rowNum = 3; $rowNum <= $highestRow; $rowNum++) {
+        // Export column layout (row 1 = headers):
+        // A=Tanggal Bongkar, B=Order Number, C=Order Type, D=Mach Number,
+        // E=Mach Type(auto), F=Pos, G=Part ID, H=Part Name, I=Category, J=Part Detail,
+        // K=Kerusakan, L=PIC Bongkar, M=Remark, N=Status(auto), O=Created By(auto), P=Created On(auto),
+        // Q=Tgl Assembling, R=Action Assembling, S=PIC Assembling, T=Remark Assembling,
+        // U=Repaired By(auto), V=Repaired At(auto),
+        // W=Tgl Pasang, X=Mesin Install, Y=Type Install(auto), Z=Pos Install,
+        // AA=PIC Pasang, AB=Remark Pemasangan, AC=Installed By(auto), AD=Installed At(auto)
+        for ($rowNum = 2; $rowNum <= $highestRow; $rowNum++) {
             $get = fn(string $col) => trim((string) ($worksheet->getCell($col . $rowNum)->getValue() ?? ''));
 
             $tanggalBongkar = $parseDate($get('A'));
             $orderType      = strtoupper($get('C'));
             $machNumber     = strtoupper($get('D'));
-            $picBongkarName = $get('K');
+            $picBongkarName = $get('L');
 
             // Validate required columns
             if (!$tanggalBongkar) {
@@ -401,27 +268,27 @@ class AssyWorkOrderExcelService
 
             // Optional fields — pembongkaran
             $orderNumber = $get('B') ?: null;
-            $pos         = $get('E') ?: null;
-            $partId      = $get('F') ? strtoupper($get('F')) : null;
-            $partName    = $get('G') ?: null;
-            $category    = $get('H') ?: null;
-            $partDetail  = $get('I') ?: null;
-            $kerusakan   = $get('J') ?: null;
-            $remark      = $get('L') ?: null;
+            $pos         = $get('F') ?: null;
+            $partId      = $get('G') ? strtoupper($get('G')) : null;
+            $partName    = $get('H') ?: null;
+            $category    = $get('I') ?: null;
+            $partDetail  = $get('J') ?: null;
+            $kerusakan   = $get('K') ?: null;
+            $remark      = $get('M') ?: null;
 
-            // Repair fields
-            $tanggalAssembling  = $parseDate($get('M'));
-            $actionAssembling   = $get('N') ?: null;
-            $picAsmRaw          = $get('O');
-            $remarkAssembling   = $get('P') ?: null;
+            // Repair fields (Q-T, U=auto)
+            $tanggalAssembling  = $parseDate($get('Q'));
+            $actionAssembling   = $get('R') ?: null;
+            $picAsmRaw          = $get('S');
+            $remarkAssembling   = $get('T') ?: null;
             $picAssemblingIds   = $picAsmRaw !== '' ? $resolvePicIds($picAsmRaw) : [];
 
-            // Install fields
-            $tanggalPasang      = $parseDate($get('Q'));
-            $installMachNumber  = strtoupper($get('R')) ?: null;
-            $installPos         = $get('S') ?: null;
-            $picPasangRaw       = $get('T');
-            $remarkPemasangan   = $get('U') ?: null;
+            // Install fields (W-AB, Y/AC/AD=auto)
+            $tanggalPasang      = $parseDate($get('W'));
+            $installMachNumber  = strtoupper($get('X')) ?: null;
+            $installPos         = $get('Z') ?: null;
+            $picPasangRaw       = $get('AA');
+            $remarkPemasangan   = $get('AB') ?: null;
             $picPasangIds       = $picPasangRaw !== '' ? $resolvePicIds($picPasangRaw) : [];
 
             // Resolve install machine
