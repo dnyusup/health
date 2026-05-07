@@ -239,29 +239,16 @@
                   enctype="multipart/form-data" class="px-6 py-5 space-y-5">
                 @csrf
 
-                <!-- Row 1: Tanggal + Status -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">
-                            Tanggal Assembling <span class="text-red-500">*</span>
-                        </label>
-                        <input type="date" name="tanggal_assembling"
-                               value="{{ old('tanggal_assembling', $work_order->tanggal_assembling?->format('Y-m-d')) }}"
-                               required
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all @error('tanggal_assembling') border-red-500 @enderror">
-                        @error('tanggal_assembling') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">
-                            Status <span class="text-red-500">*</span>
-                        </label>
-                        <select name="status" id="repairStatus" required onchange="handleStatusChange(this)"
-                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all bg-white">
-                            <option value="Open"        {{ old('status', $work_order->status) === 'Open'        ? 'selected' : '' }}>Open</option>
-                            <option value="On Progress" {{ old('status', $work_order->status) === 'On Progress' ? 'selected' : '' }}>On Progress</option>
-                            <option value="Closed"      {{ old('status', $work_order->status) === 'Closed'      ? 'selected' : '' }}>Closed</option>
-                        </select>
-                    </div>
+                <!-- Tanggal Assembling -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Tanggal Assembling <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" name="tanggal_assembling"
+                           value="{{ old('tanggal_assembling', $work_order->tanggal_assembling?->format('Y-m-d')) }}"
+                           required
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all @error('tanggal_assembling') border-red-500 @enderror">
+                    @error('tanggal_assembling') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Action -->
@@ -272,44 +259,38 @@
                               placeholder="Deskripsikan tindakan yang dilakukan...">{{ old('action_assembling', $work_order->action_assembling) }}</textarea>
                 </div>
 
-                <!-- PIC Assembling Multi-Select -->
+                <!-- PIC Assembling: searchable checklist (always visible, no dropdown) -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">
                         PIC Assembling <span class="text-red-500">*</span>
                     </label>
                     @error('pic_assembling') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
 
-                    <!-- Selected Tags + Trigger -->
-                    <div id="picAsmTagsBox"
-                         onclick="picAsmToggle(event)"
-                         class="min-h-[46px] px-3 py-2 rounded-xl border border-slate-200 bg-white flex flex-wrap gap-2 items-start cursor-pointer hover:border-amber-400 transition-all @error('pic_assembling') border-red-500 @enderror">
-                        <span id="picAsmPlaceholder" class="text-slate-400 text-sm self-center {{ count($picAsmIds) > 0 ? 'hidden' : '' }}">
-                            Pilih PIC Assembling...
-                        </span>
-                    </div>
+                    <!-- Selected tags display -->
+                    <div id="picAsmTags" class="flex flex-wrap gap-1.5 mb-2 min-h-[24px]"></div>
 
-                    <!-- Dropdown Panel -->
-                    <div id="picAsmPanel" class="hidden relative z-40 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
-                        <div class="p-2 border-b border-slate-100">
+                    <!-- Search + scrollable list always visible -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden @error('pic_assembling') border-red-400 @enderror">
+                        <div class="p-2 bg-slate-50 border-b border-slate-200">
                             <input type="text" id="picAsmSearch" placeholder="Search nama..."
                                    oninput="picAsmFilter(this.value)"
-                                   class="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500">
+                                   class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
                         </div>
-                        <ul id="picAsmList" class="max-h-48 overflow-y-auto py-1">
+                        <ul id="picAsmList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
                             @foreach($users as $u)
                             <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
                                 <button type="button"
                                         onclick="picAsmToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
                                         id="picAsmBtn_{{ $u->id }}"
-                                        class="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors flex items-center justify-between">
+                                        class="w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between
+                                               {{ in_array($u->id, $picAsmIds) ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
                                     <span>{{ $u->name }}</span>
-                                    <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'hidden' }}"></i>
+                                    <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'invisible' }}"></i>
                                 </button>
                             </li>
                             @endforeach
                         </ul>
                     </div>
-                    <!-- Hidden inputs will be injected here by JS -->
                     <div id="picAsmHidden"></div>
                 </div>
 
@@ -341,6 +322,19 @@
                                onchange="updateFotoLabel(this)">
                     </label>
                     @error('foto_kerusakan') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                </div>
+
+                <!-- Status — di paling bawah -->
+                <div class="pt-1">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        Status <span class="text-red-500">*</span>
+                    </label>
+                    <select name="status" id="repairStatus" required onchange="handleStatusChange(this)"
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all bg-white">
+                        <option value="Open"        {{ old('status', $work_order->status) === 'Open'        ? 'selected' : '' }}>Open</option>
+                        <option value="On Progress" {{ old('status', $work_order->status) === 'On Progress' ? 'selected' : '' }}>On Progress</option>
+                        <option value="Closed"      {{ old('status', $work_order->status) === 'Closed'      ? 'selected' : '' }}>Closed</option>
+                    </select>
                 </div>
 
                 <!-- Buttons -->
@@ -424,7 +418,6 @@ function confirmClose() {
 }
 
 // ===================== PIC ASSEMBLING MULTI-SELECT =====================
-// Pre-populate from existing saved values
 const picAsmSelected = new Map(); // id -> name
 @foreach($users as $u)
 @if(in_array($u->id, $picAsmIds))
@@ -433,23 +426,17 @@ picAsmSelected.set({{ $u->id }}, '{{ addslashes($u->name) }}');
 @endforeach
 
 function picAsmRender() {
-    const tagsBox = document.getElementById('picAsmTagsBox');
-    const placeholder = document.getElementById('picAsmPlaceholder');
+    const tagsBox  = document.getElementById('picAsmTags');
     const hiddenBox = document.getElementById('picAsmHidden');
 
-    // Remove old tags (keep placeholder)
-    tagsBox.querySelectorAll('.pic-asm-tag').forEach(t => t.remove());
-
-    // Render tags
+    // Tags
+    tagsBox.innerHTML = '';
     picAsmSelected.forEach((name, id) => {
         const tag = document.createElement('span');
         tag.className = 'pic-asm-tag inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1 rounded-full';
-        tag.innerHTML = `${name} <button type="button" onclick="picAsmRemove(${id})" class="ml-0.5 text-amber-600 hover:text-amber-900 leading-none">&times;</button>`;
+        tag.innerHTML = `${name} <button type="button" onclick="picAsmRemove(${id})" class="ml-0.5 text-amber-600 hover:text-amber-900 leading-none font-bold">&times;</button>`;
         tagsBox.appendChild(tag);
     });
-
-    // Placeholder
-    placeholder.classList.toggle('hidden', picAsmSelected.size > 0);
 
     // Hidden inputs
     hiddenBox.innerHTML = '';
@@ -463,30 +450,29 @@ function picAsmRender() {
 }
 
 function picAsmToggleUser(id, name) {
+    const btn   = document.getElementById('picAsmBtn_' + id);
+    const check = document.getElementById('picAsmCheck_' + id);
     if (picAsmSelected.has(id)) {
         picAsmSelected.delete(id);
-        document.getElementById('picAsmCheck_' + id)?.classList.add('hidden');
+        check?.classList.add('invisible');
+        btn?.classList.remove('bg-amber-50', 'text-amber-800', 'font-medium');
+        btn?.classList.add('text-slate-700');
     } else {
         picAsmSelected.set(id, name);
-        document.getElementById('picAsmCheck_' + id)?.classList.remove('hidden');
+        check?.classList.remove('invisible');
+        btn?.classList.add('bg-amber-50', 'text-amber-800', 'font-medium');
+        btn?.classList.remove('text-slate-700');
     }
     picAsmRender();
 }
 
 function picAsmRemove(id) {
     picAsmSelected.delete(id);
-    document.getElementById('picAsmCheck_' + id)?.classList.add('hidden');
+    document.getElementById('picAsmCheck_' + id)?.classList.add('invisible');
+    const btn = document.getElementById('picAsmBtn_' + id);
+    btn?.classList.remove('bg-amber-50', 'text-amber-800', 'font-medium');
+    btn?.classList.add('text-slate-700');
     picAsmRender();
-}
-
-function picAsmToggle(e) {
-    if (e && e.target.closest('.pic-asm-tag')) return; // don't open when clicking tag/X
-    const panel = document.getElementById('picAsmPanel');
-    panel.classList.toggle('hidden');
-    if (!panel.classList.contains('hidden')) {
-        const s = document.getElementById('picAsmSearch');
-        s.value = ''; picAsmFilter(''); s.focus();
-    }
 }
 
 function picAsmFilter(q) {
@@ -495,16 +481,6 @@ function picAsmFilter(q) {
     });
 }
 
-// Close pic dropdown on click outside (but not when clicking inside modal)
-document.addEventListener('click', function(e) {
-    const panel = document.getElementById('picAsmPanel');
-    const tagsBox = document.getElementById('picAsmTagsBox');
-    if (!panel.contains(e.target) && !tagsBox.contains(e.target)) {
-        panel.classList.add('hidden');
-    }
-});
-
-// Init render on load
 document.addEventListener('DOMContentLoaded', picAsmRender);
 
 // ===================== FOTO LABEL =====================

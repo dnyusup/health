@@ -15,7 +15,22 @@
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <form action="{{ route('work-orders.update', $work_order) }}" method="POST" class="space-y-6">
+
+            @if($work_order->status !== 'Open')
+            <div class="mb-5 flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                <i class="fas fa-lock text-amber-500"></i>
+                <div>
+                    <p class="text-sm font-semibold text-amber-800">Work Order Tidak Dapat Diedit</p>
+                    <p class="text-xs text-amber-600 mt-0.5">Status sudah <strong>{{ $work_order->status }}</strong>. Hanya Work Order berstatus <strong>Open</strong> yang dapat diedit.</p>
+                </div>
+                <a href="{{ route('work-orders.show', $work_order) }}"
+                   class="ml-auto text-sm text-amber-700 font-medium underline underline-offset-2 hover:text-amber-900 whitespace-nowrap">
+                    Kembali
+                </a>
+            </div>
+            @endif
+
+            <form action="{{ route('work-orders.update', $work_order) }}" method="POST" class="space-y-6 {{ $work_order->status !== 'Open' ? 'pointer-events-none opacity-50' : '' }}">
                 @csrf
                 @method('PUT')
 
@@ -102,7 +117,7 @@
                     </div>
                 </div>
 
-                {{-- ROW 3: Pos + Status --}}
+                {{-- ROW 3: Pos only (status dikelola via form Repair) --}}
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Pos</label>
@@ -110,14 +125,14 @@
                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">
-                            Status <span class="text-red-500">*</span>
-                        </label>
-                        <select name="status" required
-                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all bg-white">
-                            <option value="Open" {{ old('status', $work_order->status) === 'Open' ? 'selected' : '' }}>Open</option>
-                            <option value="Closed" {{ old('status', $work_order->status) === 'Closed' ? 'selected' : '' }}>Closed</option>
-                        </select>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Status</label>
+                        {{-- Status hanya bisa diubah via form Repair --}}
+                        <input type="hidden" name="status" value="{{ $work_order->status }}">
+                        <div class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 text-sm flex items-center gap-2">
+                            <i class="fas fa-lock text-slate-400 text-xs"></i>
+                            {{ $work_order->status }}
+                            <span class="ml-auto text-xs text-slate-400">(ubah via Repair)</span>
+                        </div>
                     </div>
                 </div>
 
