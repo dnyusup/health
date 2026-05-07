@@ -13,15 +13,36 @@
                     <option value="ZSPM" {{ request('order_type') === 'ZSPM' ? 'selected' : '' }}>ZSPM</option>
                     <option value="ZSBM" {{ request('order_type') === 'ZSBM' ? 'selected' : '' }}>ZSBM</option>
                 </select>
-                <select name="status" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">All Status</option>
-                    <option value="Open" {{ request('status') === 'Open' ? 'selected' : '' }}>Open</option>
-                    <option value="Closed" {{ request('status') === 'Closed' ? 'selected' : '' }}>Closed</option>
-                </select>
+                <!-- Status multi-select dropdown -->
+                <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                    @php $selectedStatuses = (array) request('status', []); @endphp
+                    <button type="button" @click="open = !open"
+                            class="flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white hover:border-slate-400 transition-all min-w-[130px]">
+                        <span class="flex-1 text-left text-slate-700">
+                            @if(count($selectedStatuses))
+                                {{ implode(', ', $selectedStatuses) }}
+                            @else
+                                All Status
+                            @endif
+                        </span>
+                        <i class="fas fa-chevron-down text-slate-400 text-xs"></i>
+                    </button>
+                    <div x-show="open" x-transition
+                         class="absolute z-20 mt-1 bg-white border border-slate-200 rounded-xl shadow-lg p-2 space-y-1 min-w-[160px]">
+                        @foreach(['Open','On Progress','Closed','Installed'] as $s)
+                        <label class="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-50 cursor-pointer text-sm text-slate-700">
+                            <input type="checkbox" name="status[]" value="{{ $s }}"
+                                   {{ in_array($s, $selectedStatuses) ? 'checked' : '' }}
+                                   class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            {{ $s }}
+                        </label>
+                        @endforeach
+                    </div>
+                </div>
                 <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all">
                     <i class="fas fa-search"></i> Filter
                 </button>
-                @if(request('search') || request('order_type') || request('status'))
+                @if(request('search') || request('order_type') || count((array)request('status', [])))
                 <a href="{{ route('work-orders.index') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
                     <i class="fas fa-times"></i> Reset
                 </a>

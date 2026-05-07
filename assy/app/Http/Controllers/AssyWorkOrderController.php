@@ -28,7 +28,8 @@ class AssyWorkOrderController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $statuses = (array) $request->status;
+            $query->whereIn('status', $statuses);
         }
 
         if ($request->filled('order_type')) {

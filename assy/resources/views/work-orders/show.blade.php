@@ -40,6 +40,7 @@
                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold {{ statusBadgeClass($work_order->status) }}">
                     {{ $work_order->status }}
                 </span>
+                @if($work_order->status !== 'Closed' || auth()->user()->isAdmin())
                 <button onclick="openRepairModal()"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium hover:bg-amber-100 transition-all">
                     <i class="fas fa-tools"></i> Repair
@@ -48,6 +49,7 @@
                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl font-medium hover:bg-blue-100 transition-all">
                     <i class="fas fa-edit"></i> Edit
                 </a>
+                @endif
                 @if(auth()->user()->isAdmin())
                 <form action="{{ route('work-orders.destroy', $work_order) }}" method="POST"
                       onsubmit="return confirm('Yakin ingin menghapus work order ini?')">
@@ -161,10 +163,12 @@
                 <h2 class="text-sm font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-tools"></i> Informasi Assembling / Repair
                 </h2>
+                @if($work_order->status !== 'Closed' || auth()->user()->isAdmin())
                 <button onclick="openRepairModal()"
                         class="text-xs text-amber-600 hover:text-amber-800 font-medium underline underline-offset-2">
                     Edit
                 </button>
+                @endif
             </div>
             {{-- Row 1: Tanggal + PIC --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
