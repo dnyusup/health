@@ -9,6 +9,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+
 class AssyWorkOrderExcelService
 {
     public function export(): void
@@ -33,7 +35,7 @@ class AssyWorkOrderExcelService
         ];
 
         foreach ($headers as $col => $header) {
-            $sheet->setCellValue(chr(65 + $col) . '1', $header);
+            $sheet->setCellValue(Coordinate::stringFromColumnIndex($col + 1) . '1', $header);
         }
 
         // Section header colors
@@ -63,7 +65,7 @@ class AssyWorkOrderExcelService
             18, 15, 12, 10, 35, 30, 20, 22,
         ];
         foreach ($colWidths as $i => $w) {
-            $sheet->getColumnDimension(chr(65 + $i))->setWidth($w);
+            $sheet->getColumnDimension(Coordinate::stringFromColumnIndex($i + 1))->setWidth($w);
         }
 
         // Pre-load all users into a map id -> name for pic_assembling / pic_pasang lookups
