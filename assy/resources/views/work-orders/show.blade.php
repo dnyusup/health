@@ -250,9 +250,9 @@
                 </button>
             </div>
 
-            <!-- Form (scrollable) (scrollable) -->
+            <!-- Form (scrollable) -->
             <form action="{{ route('work-orders.repair', $work_order) }}" method="POST"
-                  enctype="multipart/form-data" class="px-6 py-5 space-y-5 overflow-y-auto flex-1">
+                  enctype="multipart/form-data" class="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
                 @csrf
 
                 <!-- Tanggal Assembling -->
@@ -395,8 +395,8 @@
 
         <!-- Closed confirmation — absolute over modal box, no stacking context issues -->
         <div id="closedConfirmOverlay"
-             class="hidden absolute inset-0 z-10 bg-black/60 rounded-t-2xl sm:rounded-2xl flex items-center justify-center p-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
+             class="hidden absolute inset-0 z-10 bg-black/60 rounded-t-2xl sm:rounded-2xl flex items-center justify-center px-6 py-4">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-sm p-5 space-y-4">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                         <i class="fas fa-exclamation-triangle text-red-500"></i>
