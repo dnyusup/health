@@ -57,6 +57,16 @@
                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-medium hover:bg-emerald-100 transition-all">
                     <i class="fas fa-file-excel"></i> Export Excel
                 </a>
+                @if(auth()->user()->isAdmin())
+                <a href="{{ route('work-orders.import-template') }}"
+                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-50 text-violet-700 border border-violet-200 rounded-xl font-medium hover:bg-violet-100 transition-all">
+                    <i class="fas fa-download"></i> Download Template
+                </a>
+                <button type="button" onclick="document.getElementById('importWOModal').classList.remove('hidden')"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium hover:bg-amber-100 transition-all">
+                    <i class="fas fa-file-upload"></i> Import Excel
+                </button>
+                @endif
                 @if(auth()->user()->isAdmin() || auth()->user()->isShopfloor())
                 <a href="{{ route('work-orders.create') }}"
                    class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25">
@@ -71,6 +81,22 @@
             <div class="flex items-center gap-3">
                 <i class="fas fa-check-circle text-emerald-500"></i>
                 <p class="text-emerald-700">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('import_errors') && count(session('import_errors')))
+        <div class="p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <div class="flex items-start gap-3">
+                <i class="fas fa-exclamation-triangle text-amber-500 mt-0.5"></i>
+                <div>
+                    <p class="font-medium text-amber-800 mb-2">Beberapa baris gagal diimpor:</p>
+                    <ul class="text-sm text-amber-700 space-y-1 list-disc list-inside max-h-40 overflow-y-auto">
+                        @foreach(session('import_errors') as $err)
+                        <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         </div>
         @endif
@@ -170,5 +196,51 @@
             @endif
         </div>
     </div>
+
+@if(auth()->user()->isAdmin())
+<!-- Import Modal -->
+<div id="importWOModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
+                    <i class="fas fa-file-upload text-amber-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-slate-800">Import Work Orders</h3>
+                    <p class="text-xs text-slate-500">Upload file Excel sesuai template</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('importWOModal').classList.add('hidden')"
+                    class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form action="{{ route('work-orders.import') }}" method="POST" enctype="multipart/form-data" class="px-6 py-5 space-y-4">
+            @csrf
+            <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-sm text-blue-700 space-y-1">
+                <p><i class="fas fa-info-circle mr-1"></i> Gunakan template yang disediakan agar format sesuai.</p>
+                <p>Download template: <a href="{{ route('work-orders.import-template') }}" class="font-medium underline">assy_work_orders_import_template.xlsx</a></p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-2">File Excel <span class="text-red-500">*</span></label>
+                <input type="file" name="import_file" accept=".xlsx,.xls" required
+                       class="w-full text-sm text-slate-600 border border-slate-200 rounded-xl px-3 py-2.5 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition-all">
+                @error('import_file') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
+            </div>
+            <div class="flex gap-3 pt-1">
+                <button type="button" onclick="document.getElementById('importWOModal').classList.add('hidden')"
+                        class="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="flex-1 px-4 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl font-medium hover:from-amber-600 hover:to-amber-700 transition-all">
+                    <i class="fas fa-upload mr-2"></i> Upload & Import
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
 
 </x-layouts.app>

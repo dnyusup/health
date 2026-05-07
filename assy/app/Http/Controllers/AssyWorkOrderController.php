@@ -221,6 +221,40 @@ class AssyWorkOrderController extends Controller
         exit;
     }
 
+    public function importTemplate(AssyWorkOrderExcelService $service)
+    {
+        if (!auth()->user()->isAdmin()) {
+            abort(403);
+        }
+        ini_set('memory_limit', '256M');
+        set_time_limit(120);
+        ob_end_clean();
+        $service->exportTemplate();
+        exit;
+    }
+
+    public function importExcel(Request $request, AssyWorkOrderExcelService $service)
+    {
+        if (!auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'import_file' => 'required|file|mimes:xlsx,xls|max:10240',
+        ]);
+
+        ini_set('memory_limit', '256M');
+        set_time_limit(300);
+
+        $stats = $service->import($request->file('import_file'), auth()->id());
+
+        $message = "Import selesai: {$stats['inserted']} work order berhasil diimpor, {$stats['skipped']} baris diskip.";
+
+        return redirect()->route('work-orders.index')
+            ->with('success', $message)
+            ->with('import_errors', $stats['errors']);
+    }
+
     /**
      * AJAX: search parts by part_id or part_name (for autocomplete).
      */
