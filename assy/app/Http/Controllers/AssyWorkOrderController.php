@@ -8,6 +8,7 @@ use App\Models\AssyWorkOrder;
 use App\Models\User;
 use App\Services\AssyWorkOrderExcelService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class AssyWorkOrderController extends Controller
 {
@@ -82,8 +83,9 @@ class AssyWorkOrderController extends Controller
 
     public function show(AssyWorkOrder $work_order)
     {
-        $work_order->load(['machine', 'pic', 'creator']);
-        return view('work-orders.show', compact('work_order'));
+        $work_order->load(['machine', 'pic', 'creator', 'repairedBy']);
+        $users = User::orderBy('name')->get(['id', 'name']);
+        return view('work-orders.show', compact('work_order', 'users'));
     }
 
     public function edit(AssyWorkOrder $work_order)
@@ -100,7 +102,7 @@ class AssyWorkOrderController extends Controller
             'order_type'      => 'required|in:ZSPM,ZSBM',
             'machine_id'      => 'required|exists:assy_machines,id',
             'pic_bongkar'     => 'required|exists:users,id',
-            'status'          => 'required|in:Open,Closed',
+            'status'          => 'required|in:Open,On Progress,Closed',
         ]);
 
         $machine = AssyMachine::findOrFail($request->machine_id);
@@ -128,8 +130,47 @@ class AssyWorkOrderController extends Controller
 
     public function destroy(AssyWorkOrder $work_order)
     {
+        if ($work_order->foto_kerusakan) {
+            Storage::disk('public')->delete($work_order->foto_kerusakan);
+        }
         $work_order->delete();
         return redirect()->route('work-orders.index')->with('success', 'Work Order berhasil dihapus.');
+    }
+
+    public function repair(Request $request, AssyWorkOrder $work_order)
+    {
+        $request->validate([
+            'tanggal_assembling' => 'required|date',
+            'action_assembling'  => 'nullable|string|max:1000',
+            'pic_assembling'     => 'required|array|min:1',
+            'pic_assembling.*'   => 'exists:users,id',
+            'remark_assembling'  => 'nullable|string|max:1000',
+            'status'             => 'required|in:Open,On Progress,Closed',
+            'foto_kerusakan'     => 'nullable|image|max:5120',
+        ]);
+
+        $data = [
+            'tanggal_assembling' => $request->tanggal_assembling,
+            'action_assembling'  => $request->action_assembling,
+            'pic_assembling'     => $request->pic_assembling,
+            'remark_assembling'  => $request->remark_assembling,
+            'status'             => $request->status,
+            'repaired_by'        => auth()->id(),
+            'repaired_at'        => now(),
+        ];
+
+        if ($request->hasFile('foto_kerusakan')) {
+            if ($work_order->foto_kerusakan) {
+                Storage::disk('public')->delete($work_order->foto_kerusakan);
+            }
+            $data['foto_kerusakan'] = $request->file('foto_kerusakan')
+                ->store('work-orders', 'public');
+        }
+
+        $work_order->update($data);
+
+        return redirect()->route('work-orders.show', $work_order)
+            ->with('success', 'Data repair berhasil disimpan.');
     }
 
     public function exportExcel(AssyWorkOrderExcelService $service)

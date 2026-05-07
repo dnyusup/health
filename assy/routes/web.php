@@ -40,6 +40,7 @@ Route::middleware('auth')->group(function () {
     // Work Orders
     Route::resource('work-orders', AssyWorkOrderController::class);
     Route::get('work-orders-export', [AssyWorkOrderController::class, 'exportExcel'])->name('work-orders.export');
+    Route::post('work-orders/{work_order}/repair', [AssyWorkOrderController::class, 'repair'])->name('work-orders.repair');
     Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
 
     // Admin Only Routes

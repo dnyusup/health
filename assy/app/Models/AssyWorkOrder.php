@@ -25,10 +25,21 @@ class AssyWorkOrder extends Model
         'remark',
         'status',
         'created_by',
+        // assembling fields
+        'tanggal_assembling',
+        'action_assembling',
+        'pic_assembling',
+        'remark_assembling',
+        'foto_kerusakan',
+        'repaired_by',
+        'repaired_at',
     ];
 
     protected $casts = [
-        'tanggal_bongkar' => 'date',
+        'tanggal_bongkar'    => 'date',
+        'tanggal_assembling' => 'date',
+        'pic_assembling'     => 'array',
+        'repaired_at'        => 'datetime',
     ];
 
     public function machine()
@@ -44,5 +55,10 @@ class AssyWorkOrder extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function repairedBy()
+    {
+        return $this->belongsTo(User::class, 'repaired_by');
     }
 }
