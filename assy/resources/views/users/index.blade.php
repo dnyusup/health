@@ -31,12 +31,8 @@
                         @endif
                     </div>
                 </form>
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">User Management</h1>
-                <p class="text-slate-500 mt-1">Manage system users and their roles</p>
-            </div>
+        <!-- Actions -->
+        <div class="flex items-center justify-end">
             <a href="{{ route('users.create') }}" 
                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25">
                 <i class="fas fa-plus"></i>

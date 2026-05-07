@@ -25,18 +25,12 @@
             </div>
         </form>
 
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Ready Stock</h1>
-                <p class="text-slate-500 mt-1">Part dari work order yang sudah Closed &amp; siap digunakan</p>
-            </div>
-            <div class="flex items-center gap-2">
+        <!-- Actions -->
+        <div class="flex items-center gap-2 justify-end">
                 <span class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-sm font-medium">
                     <i class="fas fa-boxes"></i>
                     {{ $readyStocks->total() }} part
                 </span>
-            </div>
         </div>
 
         <!-- Messages -->

@@ -51,13 +51,8 @@
             </div>
         </form>
 
-        <!-- Header -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">Work Order Pembongkaran</h1>
-                <p class="text-slate-500 mt-1">Manage work orders pembongkaran mesin</p>
-            </div>
-            <div class="flex items-center gap-3 flex-wrap">
+        <!-- Actions -->
+        <div class="flex items-center gap-3 flex-wrap justify-end">
                 <a href="{{ route('work-orders.export') }}"
                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-medium hover:bg-emerald-100 transition-all">
                     <i class="fas fa-file-excel"></i> Export Excel
@@ -68,7 +63,6 @@
                     <i class="fas fa-plus"></i> Buat Work Order
                 </a>
                 @endif
-            </div>
         </div>
 
         <!-- Messages -->
