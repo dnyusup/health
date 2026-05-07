@@ -36,7 +36,7 @@ class UserController extends Controller
         }
 
         $users = $query
-            ->orderByRaw("FIELD(role, 'admin', 'user')")
+            ->orderByRaw("FIELD(role_assypart, 'admin', 'tech_shopfloor', 'tech_workshop', '', NULL)")
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
