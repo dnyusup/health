@@ -8,6 +8,16 @@ use App\Http\Controllers\AssyPartController;
 use App\Http\Controllers\AssyMachineController;
 use App\Http\Controllers\AssyWorkOrderController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+
+// Storage file serve via /files/ prefix (avoids Apache-level 403 on /storage/ symlink)
+Route::get('files/{path}', function (string $path) {
+    $disk = Storage::disk('public');
+    if (! $disk->exists($path)) {
+        abort(404);
+    }
+    return response()->file($disk->path($path));
+})->where('path', '.*')->name('storage.serve');
 
 // Auth Routes (Guest)
 Route::middleware('guest')->group(function () {

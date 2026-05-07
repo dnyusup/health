@@ -193,8 +193,8 @@
             @if($work_order->foto_kerusakan)
             <div>
                 <p class="text-sm text-slate-500 mb-2">Foto Kerusakan</p>
-                <a href="{{ asset('storage/'.$work_order->foto_kerusakan) }}" target="_blank">
-                    <img src="{{ asset('storage/'.$work_order->foto_kerusakan) }}"
+                <a href="{{ route('storage.serve', $work_order->foto_kerusakan) }}" target="_blank">
+                    <img src="{{ route('storage.serve', $work_order->foto_kerusakan) }}"
                          alt="Foto Kerusakan"
                          class="max-h-60 rounded-xl border border-slate-200 object-contain hover:opacity-90 transition-opacity">
                 </a>
@@ -325,7 +325,7 @@
                     </label>
                     @if($work_order->foto_kerusakan)
                     <div class="mb-3 flex items-center gap-3">
-                        <img src="{{ asset('storage/'.$work_order->foto_kerusakan) }}"
+                        <img src="{{ route('storage.serve', $work_order->foto_kerusakan) }}"
                              class="h-16 w-16 object-cover rounded-lg border border-slate-200">
                         <span class="text-xs text-slate-500">Foto saat ini. Upload baru untuk mengganti.</span>
                     </div>
