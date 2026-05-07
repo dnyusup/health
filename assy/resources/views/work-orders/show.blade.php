@@ -784,10 +784,38 @@ function updateFotoLabel(input) {
                         class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
                     Cancel
                 </button>
-                <button type="submit" form="installForm"
+                <button type="button" onclick="showInstallConfirm()"
                         class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25">
                     <i class="fas fa-save mr-2"></i> Simpan Pemasangan
                 </button>
+            </div>
+
+            <!-- Install Confirmation Overlay -->
+            <div id="installConfirmOverlay"
+                 class="hidden absolute inset-0 z-10 bg-black/60 rounded-t-2xl sm:rounded-2xl flex items-center justify-center px-6 py-4">
+                <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-sm p-5 space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                            <i class="fas fa-check-circle text-emerald-500"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-slate-800">Konfirmasi Pemasangan</h4>
+                            <p class="text-sm text-slate-500">Tindakan ini tidak dapat dibatalkan.</p>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-600">Setelah disimpan, status work order akan berubah menjadi <strong>Installed</strong> dan tidak dapat diubah lagi. Part ini juga akan <strong>hilang dari daftar ready stock</strong>.</p>
+                    <p class="text-sm text-slate-600">Pastikan semua data pemasangan sudah benar sebelum melanjutkan.</p>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="cancelInstallConfirm()"
+                                class="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
+                            Batal
+                        </button>
+                        <button type="button" onclick="confirmInstall()"
+                                class="flex-1 px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-medium hover:bg-emerald-600 transition-all">
+                            Ya, Simpan
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -814,6 +842,23 @@ function closeInstallModal() {
 @if($errors->any() && old('_token') && request()->is('*install*'))
 document.addEventListener('DOMContentLoaded', openInstallModal);
 @endif
+
+// ===================== INSTALL CONFIRMATION =====================
+function showInstallConfirm() {
+    const form = document.getElementById('installForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    document.getElementById('installConfirmOverlay').classList.remove('hidden');
+}
+function cancelInstallConfirm() {
+    document.getElementById('installConfirmOverlay').classList.add('hidden');
+}
+function confirmInstall() {
+    document.getElementById('installConfirmOverlay').classList.add('hidden');
+    document.getElementById('installForm').submit();
+}
 
 // ===================== MACHINE SEARCH =====================
 function machineFilter(q) {
