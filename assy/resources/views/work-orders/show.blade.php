@@ -166,43 +166,57 @@
                     Edit
                 </button>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="flex justify-between items-start">
-                    <span class="text-sm text-slate-500">Tanggal Assembling</span>
-                    <span class="font-semibold text-slate-800">{{ $work_order->tanggal_assembling->format('d/m/Y') }}</span>
+            {{-- Row 1: Tanggal + PIC --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Tanggal Assembling</p>
+                    <p class="text-sm font-semibold text-slate-800">{{ $work_order->tanggal_assembling->format('d/m/Y') }}</p>
                 </div>
-                <div class="flex justify-between items-start">
-                    <span class="text-sm text-slate-500">PIC Assembling</span>
-                    <span class="text-slate-800 text-right">
-                        @if($picAsmNames->isNotEmpty())
-                            {{ $picAsmNames->implode(', ') }}
-                        @else
-                            -
-                        @endif
-                    </span>
-                </div>
-                <div class="flex justify-between items-start md:col-span-2">
-                    <span class="text-sm text-slate-500">Action</span>
-                    <span class="text-slate-800 text-right">{{ $work_order->action_assembling ?: '-' }}</span>
-                </div>
-                <div class="flex justify-between items-start md:col-span-2">
-                    <span class="text-sm text-slate-500">Remark Assembling</span>
-                    <span class="text-slate-800 text-right">{{ $work_order->remark_assembling ?: '-' }}</span>
+                <div>
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">PIC Assembling</p>
+                    @if($picAsmNames->isNotEmpty())
+                    <div class="flex flex-wrap gap-1.5">
+                        @foreach($picAsmNames as $name)
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                            {{ $name }}
+                        </span>
+                        @endforeach
+                    </div>
+                    @else
+                    <p class="text-sm text-slate-500">-</p>
+                    @endif
                 </div>
             </div>
+
+            {{-- Row 2: Action --}}
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Action</p>
+                <p class="text-sm text-slate-800 whitespace-pre-wrap">{{ $work_order->action_assembling ?: '-' }}</p>
+            </div>
+
+            {{-- Row 3: Remark --}}
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Remark Assembling</p>
+                <p class="text-sm text-slate-800 whitespace-pre-wrap">{{ $work_order->remark_assembling ?: '-' }}</p>
+            </div>
+
+            {{-- Row 4: Foto --}}
             @if($work_order->foto_kerusakan)
             <div>
-                <p class="text-sm text-slate-500 mb-2">Foto Kerusakan</p>
-                <a href="{{ route('storage.serve', $work_order->foto_kerusakan) }}" target="_blank">
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-2">Foto Kerusakan</p>
+                <a href="{{ route('storage.serve', $work_order->foto_kerusakan) }}" target="_blank"
+                   class="inline-block">
                     <img src="{{ route('storage.serve', $work_order->foto_kerusakan) }}"
                          alt="Foto Kerusakan"
-                         class="max-h-60 rounded-xl border border-slate-200 object-contain hover:opacity-90 transition-opacity">
+                         class="max-h-64 w-auto rounded-xl border border-slate-200 object-contain hover:opacity-90 transition-opacity shadow-sm">
                 </a>
             </div>
             @endif
-            <div class="border-t border-slate-100 pt-3 flex gap-6 text-xs text-slate-400">
-                <span>Diisi oleh: {{ $work_order->repairedBy->name ?? '-' }}</span>
-                <span>Pada: {{ $work_order->repaired_at?->format('d/m/Y H:i') }}</span>
+
+            {{-- Footer --}}
+            <div class="border-t border-slate-100 pt-3 flex flex-wrap gap-4 text-xs text-slate-400">
+                <span><i class="fas fa-user mr-1"></i>Diisi oleh: <strong class="text-slate-600">{{ $work_order->repairedBy->name ?? '-' }}</strong></span>
+                <span><i class="fas fa-clock mr-1"></i>Pada: {{ $work_order->repaired_at?->format('d/m/Y H:i') }}</span>
             </div>
         </div>
         @endif
