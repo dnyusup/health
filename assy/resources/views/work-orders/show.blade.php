@@ -675,7 +675,7 @@ function updateFotoLabel(input) {
                 </button>
             </div>
             <!-- Form -->
-            <form action="{{ route('work-orders.install', $work_order) }}" method="POST"
+            <form id="installForm" action="{{ route('work-orders.install', $work_order) }}" method="POST"
                   class="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
                 @csrf
 
@@ -777,18 +777,18 @@ function updateFotoLabel(input) {
                               placeholder="Catatan tambahan...">{{ old('remark_pemasangan', $work_order->remark_pemasangan) }}</textarea>
                 </div>
 
-                <!-- Buttons -->
-                <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
-                    <button type="button" onclick="closeInstallModal()"
-                            class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
-                        Cancel
-                    </button>
-                    <button type="submit"
-                            class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25">
-                        <i class="fas fa-save mr-2"></i> Simpan Pemasangan
-                    </button>
-                </div>
             </form>
+            <!-- Footer Buttons -->
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 flex-shrink-0">
+                <button type="button" onclick="closeInstallModal()"
+                        class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
+                    Cancel
+                </button>
+                <button type="submit" form="installForm"
+                        class="px-6 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-medium hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-500/25">
+                    <i class="fas fa-save mr-2"></i> Simpan Pemasangan
+                </button>
+            </div>
         </div>
     </div>
 
