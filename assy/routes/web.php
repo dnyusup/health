@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssyPartController;
 use App\Http\Controllers\AssyMachineController;
 use App\Http\Controllers\AssyWorkOrderController;
+use App\Http\Controllers\ReadyStockController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -52,6 +53,9 @@ Route::middleware('auth')->group(function () {
     Route::get('work-orders-export', [AssyWorkOrderController::class, 'exportExcel'])->name('work-orders.export');
     Route::post('work-orders/{work_order}/repair', [AssyWorkOrderController::class, 'repair'])->name('work-orders.repair');
     Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
+
+    // Ready Stock
+    Route::get('ready-stock', [ReadyStockController::class, 'index'])->name('ready-stock.index');
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
