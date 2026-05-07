@@ -29,6 +29,20 @@
                                 <dd class="text-sm text-gray-900 capitalize">{{ $user->role }}</dd>
                             </div>
                             <div class="py-3 flex justify-between">
+                                <dt class="text-sm text-gray-500">Role Assypart</dt>
+                                <dd class="text-sm text-gray-900">
+                                    @if($user->role_assypart === 'admin')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700"><i class="fas fa-star text-[9px]"></i> Admin</span>
+                                    @elseif($user->role_assypart === 'tech_shopfloor')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700"><i class="fas fa-industry text-[9px]"></i> Tech Shopfloor</span>
+                                    @elseif($user->role_assypart === 'tech_workshop')
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700"><i class="fas fa-wrench text-[9px]"></i> Tech Workshop</span>
+                                    @else
+                                    <span class="text-gray-400">-</span>
+                                    @endif
+                                </dd>
+                            </div>
+                            <div class="py-3 flex justify-between">
                                 <dt class="text-sm text-gray-500">Joined</dt>
                                 <dd class="text-sm text-gray-900">{{ $user->created_at->format('d M Y') }}</dd>
                             </div>

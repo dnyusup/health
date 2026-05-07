@@ -95,6 +95,28 @@
                     @endif
                 </div>
 
+                <!-- Role Assypart -->
+                <div>
+                    <label for="role_assypart" class="block text-sm font-medium text-slate-700 mb-2">
+                        Role Assypart <span class="text-slate-400">(optional)</span>
+                    </label>
+                    <select id="role_assypart" 
+                            name="role_assypart" 
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('role_assypart') border-red-500 @enderror">
+                        <option value="" {{ old('role_assypart', $user->role_assypart) == '' ? 'selected' : '' }}>-- Tidak ada role khusus --</option>
+                        <option value="admin" {{ old('role_assypart', $user->role_assypart) == 'admin' ? 'selected' : '' }}>Admin - Kelola semua data Part</option>
+                        <option value="tech_shopfloor" {{ old('role_assypart', $user->role_assypart) == 'tech_shopfloor' ? 'selected' : '' }}>Tech Shopfloor - Create Work Order & Install Part</option>
+                        <option value="tech_workshop" {{ old('role_assypart', $user->role_assypart) == 'tech_workshop' ? 'selected' : '' }}>Tech Workshop - Repair Work Order</option>
+                    </select>
+                    @error('role_assypart')
+                    <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-2 text-sm text-slate-500">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Role khusus aplikasi Assypart, tidak mempengaruhi role sistem utama.
+                    </p>
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Password -->
                     <div>

@@ -21,6 +21,11 @@ class UserController extends Controller
             $query->where('role', request('role'));
         }
 
+        // Filter by role_assypart
+        if (request('role_assypart')) {
+            $query->where('role_assypart', request('role_assypart'));
+        }
+
         // Search by name, user_id, or email
         if ($search = request('search')) {
             $query->where(function($q) use ($search) {
@@ -57,6 +62,7 @@ class UserController extends Controller
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,user',
+            'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -95,6 +101,7 @@ class UserController extends Controller
             'email' => 'nullable|email|max:255',
             'password' => 'nullable|string|min:6|confirmed',
             'role' => 'required|in:admin,user',
+            'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
         ]);
 
         if (empty($validated['password'])) {

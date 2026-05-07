@@ -18,6 +18,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'role_assypart',
     ];
 
     protected $hidden = [
@@ -50,6 +51,27 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    /**
+     * Check if user is Assypart admin
+     */
+    public function isAssyAdmin(): bool
+    {
+        return $this->role_assypart === 'admin';
+    }
+
+    /**
+     * Get Assypart role label
+     */
+    public function assypartRoleLabel(): string
+    {
+        return match($this->role_assypart) {
+            'admin'          => 'Admin',
+            'tech_shopfloor' => 'Tech Shopfloor',
+            'tech_workshop'  => 'Tech Workshop',
+            default          => '-',
+        };
     }
 
     /**

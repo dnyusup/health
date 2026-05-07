@@ -57,6 +57,24 @@
                     @endif
                 </div>
                 <div>
+                    <p class="text-sm text-slate-500 mb-1">Role Assypart</p>
+                    @if($user->role_assypart === 'admin')
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
+                        <i class="fas fa-star text-xs"></i> Admin
+                    </span>
+                    @elseif($user->role_assypart === 'tech_shopfloor')
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
+                        <i class="fas fa-industry text-xs"></i> Tech Shopfloor
+                    </span>
+                    @elseif($user->role_assypart === 'tech_workshop')
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                        <i class="fas fa-wrench text-xs"></i> Tech Workshop
+                    </span>
+                    @else
+                    <span class="text-slate-400 text-sm">Tidak ada role khusus</span>
+                    @endif
+                </div>
+                <div>
                     <p class="text-sm text-slate-500 mb-1">Created At</p>
                     <p class="text-slate-800 font-medium">{{ $user->created_at->format('d M Y, H:i') }}</p>
                 </div>

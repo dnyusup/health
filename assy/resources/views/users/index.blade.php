@@ -16,6 +16,14 @@
                             </select>
                         </div>
                         <div>
+                            <select name="role_assypart" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                <option value="">All Assypart Roles</option>
+                                <option value="admin" {{ request('role_assypart')==='admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="tech_shopfloor" {{ request('role_assypart')==='tech_shopfloor' ? 'selected' : '' }}>Tech Shopfloor</option>
+                                <option value="tech_workshop" {{ request('role_assypart')==='tech_workshop' ? 'selected' : '' }}>Tech Workshop</option>
+                            </select>
+                        </div>
+                        <div>
                             <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all">
                                 <i class="fas fa-search"></i> <span>Filter</span>
                             </button>
@@ -71,6 +79,7 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">User ID</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Email</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role Assypart</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -103,6 +112,23 @@
                                 </span>
                                 @endif
                             </td>
+                            <td class="px-6 py-4">
+                                @if($user->role_assypart === 'admin')
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                                    <i class="fas fa-star text-[9px]"></i> Admin
+                                </span>
+                                @elseif($user->role_assypart === 'tech_shopfloor')
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
+                                    <i class="fas fa-industry text-[9px]"></i> Tech Shopfloor
+                                </span>
+                                @elseif($user->role_assypart === 'tech_workshop')
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                                    <i class="fas fa-wrench text-[9px]"></i> Tech Workshop
+                                </span>
+                                @else
+                                <span class="text-slate-400 text-xs">-</span>
+                                @endif
+                            </td>
                             <td class="px-6 py-4 text-slate-500 text-sm">{{ $user->created_at->format('d M Y') }}</td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-end gap-2">
@@ -133,7 +159,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                                         <i class="fas fa-users text-2xl text-slate-400"></i>
