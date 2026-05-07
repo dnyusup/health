@@ -135,10 +135,12 @@
                             </td>
                             <td class="px-3 py-3">
                                 <div class="flex items-center justify-center gap-1">
+                                    @if(auth()->user()->isAdmin() || auth()->user()->isShopfloor())
                                     <a href="{{ route('work-orders.edit', $wo) }}"
                                        class="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
                                         <i class="fas fa-edit text-sm"></i>
                                     </a>
+                                    @endif
                                     @if(auth()->user()->isAdmin())
                                     <form action="{{ route('work-orders.destroy', $wo) }}" method="POST"
                                           onsubmit="return confirm('Yakin hapus work order ini?')">

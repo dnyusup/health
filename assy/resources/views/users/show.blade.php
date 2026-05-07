@@ -44,20 +44,6 @@
                 </div>
                 <div>
                     <p class="text-sm text-slate-500 mb-1">Role</p>
-                    @if($user->isAdmin())
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
-                        <i class="fas fa-crown"></i>
-                        Admin
-                    </span>
-                    @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
-                        <i class="fas fa-user"></i>
-                        User
-                    </span>
-                    @endif
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 mb-1">Role Assypart</p>
                     @if($user->role_assypart === 'admin')
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
                         <i class="fas fa-star text-xs"></i> Admin
@@ -71,7 +57,7 @@
                         <i class="fas fa-wrench text-xs"></i> Tech Workshop
                     </span>
                     @else
-                    <span class="text-slate-400 text-sm">Tidak ada role khusus</span>
+                    <span class="text-slate-400 text-sm">-</span>
                     @endif
                 </div>
                 <div>

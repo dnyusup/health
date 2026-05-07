@@ -9,15 +9,8 @@
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, user id, email..." class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 w-64">
                         </div>
                         <div>
-                            <select name="role" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Roles</option>
-                                <option value="admin" {{ request('role')==='admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="user" {{ request('role')==='user' ? 'selected' : '' }}>User</option>
-                            </select>
-                        </div>
-                        <div>
                             <select name="role_assypart" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                                <option value="">All Assypart Roles</option>
+                                <option value="">All Roles</option>
                                 <option value="admin" {{ request('role_assypart')==='admin' ? 'selected' : '' }}>Admin</option>
                                 <option value="tech_shopfloor" {{ request('role_assypart')==='tech_shopfloor' ? 'selected' : '' }}>Tech Shopfloor</option>
                                 <option value="tech_workshop" {{ request('role_assypart')==='tech_workshop' ? 'selected' : '' }}>Tech Workshop</option>
@@ -28,7 +21,7 @@
                                 <i class="fas fa-search"></i> <span>Filter</span>
                             </button>
                         </div>
-                        @if(request('search') || request('role'))
+                        @if(request('search') || request('role_assypart'))
                         <div>
                             <a href="{{ route('users.index') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
                                 <i class="fas fa-times"></i> <span>Reset</span>
@@ -79,7 +72,6 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">User ID</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Email</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role Assypart</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -99,19 +91,6 @@
                                 <span class="font-mono text-sm text-slate-600 bg-slate-100 px-2 py-1 rounded">{{ $user->user_id }}</span>
                             </td>
                             <td class="px-6 py-4 text-slate-600">{{ $user->email ?? '-' }}</td>
-                            <td class="px-6 py-4">
-                                @if($user->isAdmin())
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                                    <i class="fas fa-crown text-[10px]"></i>
-                                    Admin
-                                </span>
-                                @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                                    <i class="fas fa-user text-[10px]"></i>
-                                    User
-                                </span>
-                                @endif
-                            </td>
                             <td class="px-6 py-4">
                                 @if($user->role_assypart === 'admin')
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
@@ -159,7 +138,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                                         <i class="fas fa-users text-2xl text-slate-400"></i>

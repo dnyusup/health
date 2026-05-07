@@ -42,28 +42,24 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role_assypart === 'admin';
     }
 
-    /**
-     * Check if user is regular user
-     */
+    public function isShopfloor(): bool
+    {
+        return $this->role_assypart === 'tech_shopfloor';
+    }
+
+    public function isWorkshop(): bool
+    {
+        return $this->role_assypart === 'tech_workshop';
+    }
+
     public function isUser(): bool
     {
         return $this->role === 'user';
     }
 
-    /**
-     * Check if user is Assypart admin
-     */
-    public function isAssyAdmin(): bool
-    {
-        return $this->role_assypart === 'admin';
-    }
-
-    /**
-     * Get Assypart role label
-     */
     public function assypartRoleLabel(): string
     {
         return match($this->role_assypart) {

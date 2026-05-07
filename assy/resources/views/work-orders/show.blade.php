@@ -43,23 +43,26 @@
                 <span class="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-semibold {{ statusBadgeClass($work_order->status) }}">
                     {{ $work_order->status }}
                 </span>
-                @if($work_order->status !== 'Closed' || auth()->user()->isAdmin())
+                @php $u = auth()->user(); @endphp
+                @if($u->isAdmin() || ($u->isWorkshop() && $work_order->status !== 'Closed'))
                 <button onclick="openRepairModal()"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium hover:bg-amber-100 transition-all">
                     <i class="fas fa-tools"></i> Repair
                 </button>
+                @endif
+                @if($u->isAdmin() || $u->isShopfloor())
                 <a href="{{ route('work-orders.edit', $work_order) }}"
                    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl font-medium hover:bg-blue-100 transition-all">
                     <i class="fas fa-edit"></i> Edit
                 </a>
                 @endif
-                @if($work_order->status === 'Closed' || auth()->user()->isAdmin())
+                @if($u->isAdmin() || ($u->isShopfloor() && $work_order->status === 'Closed'))
                 <button onclick="openInstallModal()"
                         class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl font-medium hover:bg-emerald-100 transition-all">
                     <i class="fas fa-wrench"></i> Install
                 </button>
                 @endif
-                @if(auth()->user()->isAdmin())
+                @if($u->isAdmin())
                 <form action="{{ route('work-orders.destroy', $work_order) }}" method="POST"
                       onsubmit="return confirm('Yakin ingin menghapus work order ini?')">
                     @csrf
@@ -172,7 +175,7 @@
                 <h2 class="text-sm font-semibold text-amber-600 uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-tools"></i> Informasi Assembling / Repair
                 </h2>
-                @if($work_order->status !== 'Closed' || auth()->user()->isAdmin())
+                @if(auth()->user()->isAdmin() || auth()->user()->isWorkshop())
                 <button onclick="openRepairModal()"
                         class="text-xs text-amber-600 hover:text-amber-800 font-medium underline underline-offset-2">
                     Edit
@@ -241,7 +244,7 @@
                 <h2 class="text-sm font-semibold text-emerald-600 uppercase tracking-wider flex items-center gap-2">
                     <i class="fas fa-wrench"></i> Informasi Pemasangan
                 </h2>
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->isAdmin() || auth()->user()->isShopfloor())
                 <button onclick="openInstallModal()"
                         class="text-xs text-emerald-600 hover:text-emerald-800 font-medium underline underline-offset-2">
                     Edit

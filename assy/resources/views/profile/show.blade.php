@@ -26,10 +26,6 @@
                             </div>
                             <div class="py-3 flex justify-between">
                                 <dt class="text-sm text-gray-500">Role</dt>
-                                <dd class="text-sm text-gray-900 capitalize">{{ $user->role }}</dd>
-                            </div>
-                            <div class="py-3 flex justify-between">
-                                <dt class="text-sm text-gray-500">Role Assypart</dt>
                                 <dd class="text-sm text-gray-900">
                                     @if($user->role_assypart === 'admin')
                                     <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700"><i class="fas fa-star text-[9px]"></i> Admin</span>

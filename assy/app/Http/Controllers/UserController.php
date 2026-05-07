@@ -61,11 +61,11 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:admin,user',
             'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
+        $validated['role'] = 'user'; // auto-set, tidak diekspos ke form
 
         User::create($validated);
 
@@ -100,7 +100,6 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'password' => 'nullable|string|min:6|confirmed',
-            'role' => 'required|in:admin,user',
             'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
         ]);
 
