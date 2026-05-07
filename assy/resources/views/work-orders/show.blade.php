@@ -259,37 +259,21 @@
                               placeholder="Deskripsikan tindakan yang dilakukan...">{{ old('action_assembling', $work_order->action_assembling) }}</textarea>
                 </div>
 
-                <!-- PIC Assembling: searchable checklist (always visible, no dropdown) -->
+                <!-- PIC Assembling: searchable dropdown -->
                 <div>
                     <label class="block text-sm font-medium text-slate-700 mb-2">
                         PIC Assembling <span class="text-red-500">*</span>
                     </label>
                     @error('pic_assembling') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
 
-                    <!-- Selected tags display -->
-                    <div id="picAsmTags" class="flex flex-wrap gap-1.5 mb-2 min-h-[24px]"></div>
-
-                    <!-- Search + scrollable list always visible -->
-                    <div class="border border-slate-200 rounded-xl overflow-hidden @error('pic_assembling') border-red-400 @enderror">
-                        <div class="p-2 bg-slate-50 border-b border-slate-200">
-                            <input type="text" id="picAsmSearch" placeholder="Search nama..."
-                                   oninput="picAsmFilter(this.value)"
-                                   class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
+                    <!-- Trigger: click to open dropdown -->
+                    <div id="picAsmTrigger"
+                         onclick="picAsmToggleDropdown()"
+                         class="min-h-[46px] w-full px-3 py-2 rounded-xl border border-slate-200 bg-white flex flex-wrap gap-1.5 items-center cursor-pointer hover:border-amber-400 transition-all @error('pic_assembling') border-red-400 @enderror">
+                        <div id="picAsmTags" class="flex flex-wrap gap-1.5 flex-1 items-center">
+                            <span id="picAsmPlaceholder" class="text-slate-400 text-sm">Pilih PIC Assembling...</span>
                         </div>
-                        <ul id="picAsmList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
-                            @foreach($users as $u)
-                            <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
-                                <button type="button"
-                                        onclick="picAsmToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
-                                        id="picAsmBtn_{{ $u->id }}"
-                                        class="w-full text-left px-4 py-2 text-sm transition-colors flex items-center justify-between
-                                               {{ in_array($u->id, $picAsmIds) ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
-                                    <span>{{ $u->name }}</span>
-                                    <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'invisible' }}"></i>
-                                </button>
-                            </li>
-                            @endforeach
-                        </ul>
+                        <i id="picAsmChevron" class="fas fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform duration-200"></i>
                     </div>
                     <div id="picAsmHidden"></div>
                 </div>
@@ -387,7 +371,8 @@ function openRepairModal() {
 }
 function closeRepairModal() {
     document.getElementById('repairModalOverlay').classList.add('hidden');
-    document.getElementById('picAsmPanel').classList.add('hidden');
+    document.getElementById('picAsmPanel')?.classList.add('hidden');
+    document.getElementById('picAsmChevron')?.classList.remove('rotate-180');
     document.body.style.overflow = '';
 }
 function handleOverlayClick(e) {
@@ -426,17 +411,24 @@ picAsmSelected.set({{ $u->id }}, '{{ addslashes($u->name) }}');
 @endforeach
 
 function picAsmRender() {
-    const tagsBox  = document.getElementById('picAsmTags');
+    const tagsBox   = document.getElementById('picAsmTags');
+    const placeholder = document.getElementById('picAsmPlaceholder');
     const hiddenBox = document.getElementById('picAsmHidden');
 
-    // Tags
-    tagsBox.innerHTML = '';
-    picAsmSelected.forEach((name, id) => {
-        const tag = document.createElement('span');
-        tag.className = 'pic-asm-tag inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1 rounded-full';
-        tag.innerHTML = `${name} <button type="button" onclick="picAsmRemove(${id})" class="ml-0.5 text-amber-600 hover:text-amber-900 leading-none font-bold">&times;</button>`;
-        tagsBox.appendChild(tag);
-    });
+    // Remove old tags but keep placeholder
+    tagsBox.querySelectorAll('.pic-asm-tag').forEach(t => t.remove());
+
+    if (picAsmSelected.size > 0) {
+        placeholder?.classList.add('hidden');
+        picAsmSelected.forEach((name, id) => {
+            const tag = document.createElement('span');
+            tag.className = 'pic-asm-tag inline-flex items-center gap-1 bg-amber-100 text-amber-800 text-xs font-medium px-2.5 py-1 rounded-full';
+            tag.innerHTML = `${name} <button type="button" onclick="event.stopPropagation();picAsmRemove(${id})" class="ml-0.5 text-amber-600 hover:text-amber-900 leading-none font-bold">&times;</button>`;
+            tagsBox.appendChild(tag);
+        });
+    } else {
+        placeholder?.classList.remove('hidden');
+    }
 
     // Hidden inputs
     hiddenBox.innerHTML = '';
@@ -448,6 +440,53 @@ function picAsmRender() {
         hiddenBox.appendChild(input);
     });
 }
+
+function picAsmToggleDropdown() {
+    const panel   = document.getElementById('picAsmPanel');
+    const trigger = document.getElementById('picAsmTrigger');
+    const chevron = document.getElementById('picAsmChevron');
+
+    if (!panel.classList.contains('hidden')) {
+        panel.classList.add('hidden');
+        chevron?.classList.remove('rotate-180');
+        return;
+    }
+
+    // Position the panel below (or above) the trigger
+    const rect = trigger.getBoundingClientRect();
+    const panelW = Math.max(rect.width, 280);
+    panel.style.width = panelW + 'px';
+    panel.style.left  = rect.left + 'px';
+
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const panelH = 280; // approximate panel height
+    if (spaceBelow < panelH && rect.top > panelH) {
+        panel.style.top  = '';
+        panel.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+    } else {
+        panel.style.bottom = '';
+        panel.style.top = (rect.bottom + 4) + 'px';
+    }
+
+    panel.classList.remove('hidden');
+    chevron?.classList.add('rotate-180');
+
+    const search = document.getElementById('picAsmSearch');
+    search.value = '';
+    picAsmFilter('');
+    setTimeout(() => search.focus(), 50);
+}
+
+// Close dropdown when clicking outside trigger/panel
+document.addEventListener('click', function(e) {
+    const panel   = document.getElementById('picAsmPanel');
+    const trigger = document.getElementById('picAsmTrigger');
+    if (!panel || panel.classList.contains('hidden')) return;
+    if (!panel.contains(e.target) && !trigger.contains(e.target)) {
+        panel.classList.add('hidden');
+        document.getElementById('picAsmChevron')?.classList.remove('rotate-180');
+    }
+});
 
 function picAsmToggleUser(id, name) {
     const btn   = document.getElementById('picAsmBtn_' + id);
@@ -489,5 +528,28 @@ function updateFotoLabel(input) {
     lbl.textContent = input.files[0]?.name || 'Pilih foto...';
 }
 </script>
+
+<!-- PIC Assembling Dropdown Panel (fixed-positioned, not clipped by modal overflow) -->
+<div id="picAsmPanel" class="hidden fixed z-[200] bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden" style="width:320px;">
+    <div class="p-2 bg-slate-50 border-b border-slate-200">
+        <input type="text" id="picAsmSearch" placeholder="Search nama..."
+               oninput="picAsmFilter(this.value)"
+               class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
+    </div>
+    <ul id="picAsmList" class="overflow-y-auto divide-y divide-slate-50" style="max-height:220px;">
+        @foreach($users as $u)
+        <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
+            <button type="button"
+                    onclick="picAsmToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
+                    id="picAsmBtn_{{ $u->id }}"
+                    class="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
+                           {{ in_array($u->id, $picAsmIds) ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
+                <span>{{ $u->name }}</span>
+                <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'invisible' }}"></i>
+            </button>
+        </li>
+        @endforeach
+    </ul>
+</div>
 
 </x-layouts.app>
