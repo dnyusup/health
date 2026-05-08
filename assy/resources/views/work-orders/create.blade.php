@@ -19,7 +19,7 @@
                 @csrf
 
                 {{-- ROW 1: Tanggal, Order Number, Order Type --}}
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">
                             Tanggal Bongkar <span class="text-red-500">*</span>
@@ -29,15 +29,15 @@
                         @error('tanggal_bongkar') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     </div>
 
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="block text-sm font-medium text-slate-700 mb-2">Order Number <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
                             <input type="text" name="order_number" id="order_number_input" value="{{ old('order_number') }}" required
                                    placeholder="e.g. ZSPM-2025-001"
-                                   class="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('order_number') border-red-500 @enderror">
+                                   class="flex-1 min-w-0 px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('order_number') border-red-500 @enderror">
                             <button type="button" onclick="openScanner('order_number')"
                                     title="Scan Barcode/QR Code"
-                                    class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition-all flex-shrink-0">
+                                    class="px-3 py-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition-all flex-shrink-0">
                                 <i class="fas fa-qrcode"></i>
                             </button>
                         </div>
