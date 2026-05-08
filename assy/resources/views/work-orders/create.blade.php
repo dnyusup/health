@@ -31,9 +31,16 @@
 
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Order Number <span class="text-red-500">*</span></label>
-                        <input type="text" name="order_number" value="{{ old('order_number') }}" required
-                               placeholder="e.g. ZSPM-2025-001"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('order_number') border-red-500 @enderror">
+                        <div class="flex gap-2">
+                            <input type="text" name="order_number" id="order_number_input" value="{{ old('order_number') }}" required
+                                   placeholder="e.g. ZSPM-2025-001"
+                                   class="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('order_number') border-red-500 @enderror">
+                            <button type="button" onclick="openScanner('order_number')"
+                                    title="Scan Barcode/QR Code"
+                                    class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition-all flex-shrink-0">
+                                <i class="fas fa-qrcode"></i>
+                            </button>
+                        </div>
                         @error('order_number') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     </div>
 
@@ -114,11 +121,18 @@
                         {{-- Part ID AJAX search --}}
                         <div class="relative">
                             <label class="block text-sm font-medium text-slate-700 mb-2">Part ID</label>
-                            <input type="text" name="part_id" id="part_id_input"
-                                   value="{{ old('part_id') }}"
-                                   placeholder="Ketik Part ID untuk search..."
-                                   autocomplete="off"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all uppercase">
+                            <div class="flex gap-2">
+                                <input type="text" name="part_id" id="part_id_input"
+                                       value="{{ old('part_id') }}"
+                                       placeholder="Ketik Part ID untuk search..."
+                                       autocomplete="off"
+                                       class="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all uppercase">
+                                <button type="button" onclick="openScanner('part_id')"
+                                        title="Scan Barcode/QR Code"
+                                        class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 transition-all flex-shrink-0">
+                                    <i class="fas fa-qrcode"></i>
+                                </button>
+                            </div>
                             <div id="partDropdown" class="hidden absolute z-30 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-lg overflow-hidden">
                                 <ul id="partList" class="max-h-52 overflow-y-auto py-1"></ul>
                             </div>
@@ -357,4 +371,76 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
-</x-layouts.app>
+<!-- Barcode/QR Scanner Modal -->
+<div id="scannerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <i class="fas fa-qrcode text-blue-600"></i>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-slate-800" id="scannerTitle">Scan Barcode / QR Code</h3>
+                    <p class="text-xs text-slate-500" id="scannerSubtitle">Arahkan kamera ke kode</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeScanner()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="p-4">
+            <div id="scannerViewport" class="rounded-xl overflow-hidden bg-slate-900" style="min-height:260px"></div>
+            <p class="mt-3 text-xs text-center text-slate-400">Scan otomatis saat kode terdeteksi</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+let html5QrCode = null;
+let scanTarget = null;
+
+function openScanner(target) {
+    scanTarget = target;
+    const titles = { order_number: 'Scan Order Number', part_id: 'Scan Part ID' };
+    document.getElementById('scannerTitle').textContent = titles[target] || 'Scan Barcode / QR Code';
+    document.getElementById('scannerModal').classList.remove('hidden');
+
+    html5QrCode = new Html5Qrcode('scannerViewport');
+    html5QrCode.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 240, height: 160 }, aspectRatio: 1.4 },
+        (decodedText) => {
+            handleScanResult(decodedText.trim().toUpperCase());
+        },
+        () => {} // ignore per-frame errors
+    ).catch(err => {
+        document.getElementById('scannerViewport').innerHTML =
+            '<p class="text-red-400 text-sm text-center p-6"><i class="fas fa-exclamation-triangle mr-1"></i>Kamera tidak dapat diakses.<br>Pastikan izin kamera diberikan.</p>';
+    });
+}
+
+function closeScanner() {
+    if (html5QrCode) {
+        html5QrCode.stop().catch(() => {}).finally(() => {
+            html5QrCode.clear();
+            html5QrCode = null;
+        });
+    }
+    document.getElementById('scannerModal').classList.add('hidden');
+    scanTarget = null;
+}
+
+function handleScanResult(value) {
+    closeScanner();
+    if (scanTarget === 'order_number') {
+        document.getElementById('order_number_input').value = value;
+    } else if (scanTarget === 'part_id') {
+        partInput.value = value;
+        // trigger part lookup
+        partInput.dispatchEvent(new Event('input'));
+        // cek WO status setelah debounce selesai
+        setTimeout(() => checkPartWoStatus(value), 400);
+    }
+}
+</script>
