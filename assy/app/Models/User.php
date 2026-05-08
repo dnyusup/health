@@ -69,12 +69,4 @@ class User extends Authenticatable
             default          => '-',
         };
     }
-
-    /**
-     * Get stock transactions
-     */
-    public function stockTransactions()
-    {
-        return $this->hasMany(StockTransaction::class);
-    }
 }
