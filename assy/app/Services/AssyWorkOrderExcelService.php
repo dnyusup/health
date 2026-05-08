@@ -82,7 +82,7 @@ class AssyWorkOrderExcelService
         $row = 2;
         foreach (AssyWorkOrder::with(['pic', 'creator', 'repairedBy', 'installedBy'])->cursor() as $wo) {
             // Pembongkaran
-            $sheet->setCellValue('A' . $row, $wo->tanggal_bongkar?->format('m/d/Y'));
+            $sheet->setCellValue('A' . $row, $wo->tanggal_bongkar?->format('d/m/Y'));
             $sheet->setCellValue('B' . $row, $wo->order_number);
             $sheet->setCellValue('C' . $row, $wo->order_type);
             $sheet->setCellValue('D' . $row, $wo->mach_number);
@@ -97,23 +97,23 @@ class AssyWorkOrderExcelService
             $sheet->setCellValue('M' . $row, $wo->remark);
             $sheet->setCellValue('N' . $row, $wo->status);
             $sheet->setCellValue('O' . $row, $wo->creator->name ?? '');
-            $sheet->setCellValue('P' . $row, $wo->created_at?->format('m/d/Y H:i:s'));
+            $sheet->setCellValue('P' . $row, $wo->created_at?->format('d/m/Y H:i:s'));
             // Repair / Assembling
-            $sheet->setCellValue('Q' . $row, $wo->tanggal_assembling?->format('m/d/Y'));
+            $sheet->setCellValue('Q' . $row, $wo->tanggal_assembling?->format('d/m/Y'));
             $sheet->setCellValue('R' . $row, $wo->action_assembling);
             $sheet->setCellValue('S' . $row, $resolvePicNames($wo->pic_assembling));
             $sheet->setCellValue('T' . $row, $wo->remark_assembling);
             $sheet->setCellValue('U' . $row, $wo->repairedBy->name ?? '');
-            $sheet->setCellValue('V' . $row, $wo->repaired_at?->format('m/d/Y H:i:s'));
+            $sheet->setCellValue('V' . $row, $wo->repaired_at?->format('d/m/Y H:i:s'));
             // Pemasangan / Install
-            $sheet->setCellValue('W' . $row, $wo->tanggal_pasang?->format('m/d/Y'));
+            $sheet->setCellValue('W' . $row, $wo->tanggal_pasang?->format('d/m/Y'));
             $sheet->setCellValue('X' . $row, $wo->install_mach_number);
             $sheet->setCellValue('Y' . $row, $wo->install_mach_type);
             $sheet->setCellValue('Z' . $row, $wo->install_pos);
             $sheet->setCellValue('AA' . $row, $resolvePicNames($wo->pic_pasang));
             $sheet->setCellValue('AB' . $row, $wo->remark_pemasangan);
             $sheet->setCellValue('AC' . $row, $wo->installedBy->name ?? '');
-            $sheet->setCellValue('AD' . $row, $wo->installed_at?->format('m/d/Y H:i:s'));
+            $sheet->setCellValue('AD' . $row, $wo->installed_at?->format('d/m/Y H:i:s'));
             $row++;
         }
 
