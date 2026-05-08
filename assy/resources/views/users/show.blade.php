@@ -70,57 +70,5 @@
                 </div>
             </div>
         </div>
-
-        <!-- Recent Transactions -->
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-6 border-b border-slate-200">
-                <h3 class="text-lg font-semibold text-slate-800">Recent Transactions</h3>
-                <p class="text-slate-500 text-sm mt-1">Stock transactions made by this user</p>
-            </div>
-            
-            @if($user->stockTransactions->count() > 0)
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-slate-50 border-b border-slate-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Sparepart</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Quantity</th>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase">Reference</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @foreach($user->stockTransactions->take(10) as $transaction)
-                        <tr class="hover:bg-slate-50">
-                            <td class="px-6 py-4 text-sm text-slate-600">{{ $transaction->created_at->format('d M Y') }}</td>
-                            <td class="px-6 py-4">
-                                @if($transaction->type === 'in')
-                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                                    <i class="fas fa-arrow-down"></i> IN
-                                </span>
-                                @else
-                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                    <i class="fas fa-arrow-up"></i> OUT
-                                </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-800">{{ $transaction->sparepart->description ?? '-' }}</td>
-                            <td class="px-6 py-4 text-sm font-medium text-slate-800">{{ $transaction->quantity }}</td>
-                            <td class="px-6 py-4 text-sm text-slate-600">{{ $transaction->reference_no ?? '-' }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            @else
-            <div class="p-12 text-center">
-                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-exchange-alt text-2xl text-slate-400"></i>
-                </div>
-                <p class="text-slate-500">No transactions yet</p>
-            </div>
-            @endif
-        </div>
     </div>
 </x-layouts.app>

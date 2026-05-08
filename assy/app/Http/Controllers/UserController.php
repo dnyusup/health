@@ -78,7 +78,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('stockTransactions.sparepart');
         return view('users.show', compact('user'));
     }
 
