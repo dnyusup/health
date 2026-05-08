@@ -8,6 +8,7 @@
                 'On Progress' => 'bg-amber-100 text-amber-700',
                 'Closed'      => 'bg-slate-100 text-slate-600',
                 'Installed'   => 'bg-blue-100 text-blue-700',
+                'Scrap'       => 'bg-red-100 text-red-700',
                 default       => 'bg-slate-100 text-slate-500',
             };
         }
@@ -453,6 +454,7 @@
                         <option value="">-- Pilih Status --</option>
                         <option value="On Progress" {{ old('status') === 'On Progress' ? 'selected' : '' }}>On Progress</option>
                         <option value="Closed"      {{ old('status') === 'Closed'      ? 'selected' : '' }}>Closed</option>
+                        <option value="Scrap"        {{ old('status') === 'Scrap'        ? 'selected' : '' }}>Scrap</option>
                     </select>
                 </div>
 
@@ -479,11 +481,11 @@
                         <i class="fas fa-exclamation-triangle text-red-500"></i>
                     </div>
                     <div>
-                        <h4 class="font-semibold text-slate-800">Konfirmasi Close</h4>
-                        <p class="text-sm text-slate-500">Work order akan ditutup permanen.</p>
+                        <h4 class="font-semibold text-slate-800" id="closedConfirmTitle">Konfirmasi</h4>
+                        <p class="text-sm text-slate-500" id="closedConfirmSubtitle">Perubahan status permanen.</p>
                     </div>
                 </div>
-                <p class="text-sm text-slate-600">Yakin ingin mengubah status menjadi <strong>Closed</strong>? Pastikan semua pekerjaan sudah selesai.</p>
+                <p class="text-sm text-slate-600" id="closedConfirmMsg">Yakin ingin mengubah status menjadi <strong>Closed</strong>? Pastikan semua pekerjaan sudah selesai.</p>
                 <div class="flex gap-3">
                     <button type="button" onclick="cancelClose()"
                             class="flex-1 px-4 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
@@ -525,18 +527,36 @@ document.addEventListener('DOMContentLoaded', openRepairModal);
 // ===================== STATUS CLOSED CONFIRMATION =====================
 let pendingClose = false;
 function handleStatusChange(sel) {
-    if (sel.value === 'Closed') {
+    if (sel.value === 'Closed' || sel.value === 'Scrap') {
         // revert temporarily while user confirms
+        const chosen = sel.value;
         sel.value = '{{ $work_order->status }}';
         document.getElementById('closedConfirmOverlay').classList.remove('hidden');
+        // store chosen for confirmClose
+        document.getElementById('closedConfirmOverlay').dataset.chosen = chosen;
+        // update confirm message based on choice
+        const msgEl = document.getElementById('closedConfirmMsg');
+        const titleEl = document.getElementById('closedConfirmTitle');
+        const subtitleEl = document.getElementById('closedConfirmSubtitle');
+        if (chosen === 'Scrap') {
+            if (titleEl) titleEl.textContent = 'Konfirmasi Scrap';
+            if (subtitleEl) subtitleEl.textContent = 'Part akan ditandai tidak dapat digunakan.';
+            if (msgEl) msgEl.innerHTML = 'Yakin tandai part ini sebagai <strong>Scrap</strong>? Part sudah tidak bisa direpair dan digunakan kembali.';
+        } else {
+            if (titleEl) titleEl.textContent = 'Konfirmasi Close';
+            if (subtitleEl) subtitleEl.textContent = 'Work order akan ditutup permanen.';
+            if (msgEl) msgEl.innerHTML = 'Yakin ingin mengubah status menjadi <strong>Closed</strong>? Pastikan semua pekerjaan sudah selesai.';
+        }
     }
 }
 function cancelClose() {
     document.getElementById('closedConfirmOverlay').classList.add('hidden');
 }
 function confirmClose() {
-    document.getElementById('closedConfirmOverlay').classList.add('hidden');
-    document.getElementById('repairStatus').value = 'Closed';
+    const overlay = document.getElementById('closedConfirmOverlay');
+    const chosen = overlay.dataset.chosen || 'Closed';
+    overlay.classList.add('hidden');
+    document.getElementById('repairStatus').value = chosen;
 }
 
 // ===================== PIC ASSEMBLING MULTI-SELECT =====================

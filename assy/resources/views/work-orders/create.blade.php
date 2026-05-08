@@ -354,9 +354,16 @@ function checkPartWoStatus(partId) {
     })
     .then(r => r.json())
     .then(data => {
-        if (data.status && data.status !== 'Installed') {
+        if (data.status === 'Scrap') {
             const wo = data.order_number ? ` (WO: ${data.order_number})` : '';
             const tgl = data.tanggal_bongkar ? `, dibongkar ${data.tanggal_bongkar}` : '';
+            warning.className = 'p-3 rounded-xl bg-red-50 border border-red-400';
+            warningText.innerHTML = `<strong>⚠ Part ini sudah di-Scrap</strong>${wo}${tgl}. Part sudah tidak bisa direpair dan digunakan kembali. Pastikan ini bukan kesalahan input.`;
+            warning.classList.remove('hidden');
+        } else if (data.status && data.status !== 'Installed') {
+            const wo = data.order_number ? ` (WO: ${data.order_number})` : '';
+            const tgl = data.tanggal_bongkar ? `, dibongkar ${data.tanggal_bongkar}` : '';
+            warning.className = 'p-3 rounded-xl bg-red-50 border border-red-300';
             warningText.textContent = `Part ID ini masih ada di work order aktif dengan status "${data.status}"${wo}${tgl}. Pastikan ini bukan duplikasi.`;
             warning.classList.remove('hidden');
         } else {

@@ -156,7 +156,7 @@ class AssyWorkOrderController extends Controller
             'pic_assembling'     => 'required|array|min:1',
             'pic_assembling.*'   => 'exists:users,id',
             'remark_assembling'  => 'nullable|string|max:1000',
-            'status'             => 'required|in:On Progress,Closed',
+            'status'             => 'required|in:On Progress,Closed,Scrap',
         ]);
 
         $data = [

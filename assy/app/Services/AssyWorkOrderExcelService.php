@@ -304,7 +304,7 @@ class AssyWorkOrderExcelService
 
             // Determine status: baca dari kolom N (export), jika tidak valid auto-determine
             $statusRaw = $get('N');
-            $validStatuses = ['Open', 'On Progress', 'Closed', 'Installed'];
+            $validStatuses = ['Open', 'On Progress', 'Closed', 'Installed', 'Scrap'];
             if (in_array($statusRaw, $validStatuses)) {
                 $status = $statusRaw;
             } elseif ($tanggalPasang && $installMachineId) {
