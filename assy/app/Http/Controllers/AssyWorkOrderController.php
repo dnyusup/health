@@ -61,6 +61,7 @@ class AssyWorkOrderController extends Controller
         }
         $request->validate([
             'tanggal_bongkar' => 'required|date',
+            'order_number'    => 'required|string|max:50',
             'order_type'      => 'required|in:ZSPM,ZSBM',
             'machine_id'      => 'required|exists:assy_machines,id',
             'pic_bongkar'     => 'required|exists:users,id',

@@ -30,10 +30,11 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-slate-700 mb-2">Order Number</label>
-                        <input type="text" name="order_number" value="{{ old('order_number') }}"
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Order Number <span class="text-red-500">*</span></label>
+                        <input type="text" name="order_number" value="{{ old('order_number') }}" required
                                placeholder="e.g. ZSPM-2025-001"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('order_number') border-red-500 @enderror">
+                        @error('order_number') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
@@ -125,24 +126,24 @@
 
                         <div>
                             <label class="block text-sm font-medium text-slate-700 mb-2">Category</label>
-                            <input type="text" name="category" id="category_input" value="{{ old('category') }}"
-                                   placeholder="Auto-fill atau manual"
-                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                            <input type="text" name="category" id="category_input" value="{{ old('category') }}" readonly
+                                   placeholder="Auto-fill dari Part ID"
+                                   class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 outline-none">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Part Name</label>
-                        <input type="text" name="part_name" id="part_name_input" value="{{ old('part_name') }}"
-                               placeholder="Auto-fill atau manual"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                        <input type="text" name="part_name" id="part_name_input" value="{{ old('part_name') }}" readonly
+                               placeholder="Auto-fill dari Part ID"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 outline-none">
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">Part Detail</label>
-                        <input type="text" name="part_detail" id="part_detail_input" value="{{ old('part_detail') }}"
-                               placeholder="Auto-fill atau manual"
-                               class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
+                        <input type="text" name="part_detail" id="part_detail_input" value="{{ old('part_detail') }}" readonly
+                               placeholder="Auto-fill dari Part ID"
+                               class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 outline-none">
                     </div>
 
                     {{-- Part WO Status Warning --}}
