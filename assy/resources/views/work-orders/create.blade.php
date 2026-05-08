@@ -221,7 +221,8 @@
                         @error('pic_bongkar') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     </div>
                 </div>
-            </form>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
                     <a href="{{ route('work-orders.index') }}"
                        class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
                         Cancel
@@ -443,3 +444,5 @@ function handleScanResult(value) {
     }
 }
 </script>
+
+</x-layouts.app>
