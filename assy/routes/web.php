@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::post('work-orders/{work_order}/repair', [AssyWorkOrderController::class, 'repair'])->name('work-orders.repair');
     Route::post('work-orders/{work_order}/install', [AssyWorkOrderController::class, 'install'])->name('work-orders.install');
     Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
+    Route::get('api/part-wo-status', [AssyWorkOrderController::class, 'partWoStatus'])->name('api.part-wo-status');
 
     // Ready Stock
     Route::get('ready-stock', [ReadyStockController::class, 'index'])->name('ready-stock.index');

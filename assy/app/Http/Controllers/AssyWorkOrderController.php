@@ -263,4 +263,26 @@ class AssyWorkOrderController extends Controller
 
         return response()->json($parts);
     }
+
+    public function partWoStatus(Request $request)
+    {
+        $partId = strtoupper(trim($request->get('part_id', '')));
+        if (empty($partId)) {
+            return response()->json(['status' => null, 'order_number' => null]);
+        }
+
+        $latest = AssyWorkOrder::where('part_id', $partId)
+            ->orderByDesc('created_at')
+            ->first(['status', 'order_number', 'tanggal_bongkar']);
+
+        if (!$latest) {
+            return response()->json(['status' => null, 'order_number' => null]);
+        }
+
+        return response()->json([
+            'status'        => $latest->status,
+            'order_number'  => $latest->order_number,
+            'tanggal_bongkar' => $latest->tanggal_bongkar?->format('d/m/Y'),
+        ]);
+    }
 }

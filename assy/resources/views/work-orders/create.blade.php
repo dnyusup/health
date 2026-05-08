@@ -144,6 +144,14 @@
                                placeholder="Auto-fill atau manual"
                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all">
                     </div>
+
+                    {{-- Part WO Status Warning --}}
+                    <div id="partWoWarning" class="hidden p-3 rounded-xl bg-red-50 border border-red-300">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-circle text-red-500 mt-0.5 flex-shrink-0"></i>
+                            <p class="text-sm text-red-700" id="partWoWarningText"></p>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- ROW 5: Kerusakan + Remark --}}
@@ -198,9 +206,7 @@
                         @error('pic_bongkar') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     </div>
                 </div>
-
-                <!-- Buttons -->
-                <div class="flex items-center justify-end gap-3 pt-2 border-t border-slate-100">
+            </form>
                     <a href="{{ route('work-orders.index') }}"
                        class="px-5 py-2.5 text-slate-600 bg-slate-100 rounded-xl font-medium hover:bg-slate-200 transition-all">
                         Cancel
@@ -289,7 +295,11 @@ const partList = document.getElementById('partList');
 partInput.addEventListener('input', function () {
     clearTimeout(partTimer);
     const q = this.value.trim();
-    if (q.length < 1) { partDropdown.classList.add('hidden'); return; }
+    if (q.length < 1) {
+        partDropdown.classList.add('hidden');
+        document.getElementById('partWoWarning').classList.add('hidden');
+        return;
+    }
     partTimer = setTimeout(() => {
         fetch(`{{ route('api.part-lookup') }}?q=${encodeURIComponent(q)}`, {
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -316,6 +326,27 @@ function selectPart(partId, partName, category, partDetail) {
     document.getElementById('category_input').value = category;
     document.getElementById('part_detail_input').value = partDetail;
     partDropdown.classList.add('hidden');
+    checkPartWoStatus(partId);
+}
+
+function checkPartWoStatus(partId) {
+    const warning = document.getElementById('partWoWarning');
+    const warningText = document.getElementById('partWoWarningText');
+    if (!partId) { warning.classList.add('hidden'); return; }
+    fetch(`{{ route('api.part-wo-status') }}?part_id=${encodeURIComponent(partId)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status && data.status !== 'Installed') {
+            const wo = data.order_number ? ` (WO: ${data.order_number})` : '';
+            const tgl = data.tanggal_bongkar ? `, dibongkar ${data.tanggal_bongkar}` : '';
+            warningText.textContent = `Part ID ini masih ada di work order aktif dengan status "${data.status}"${wo}${tgl}. Pastikan ini bukan duplikasi.`;
+            warning.classList.remove('hidden');
+        } else {
+            warning.classList.add('hidden');
+        }
+    });
 }
 
 document.addEventListener('click', function(e) {
