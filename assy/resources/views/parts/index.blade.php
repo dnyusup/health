@@ -5,6 +5,8 @@
     <div class="space-y-6">
         <!-- Filter & Search -->
         <form method="GET" action="{{ route('parts.index') }}" class="mb-4">
+            <input type="hidden" name="sort" value="{{ $sortBy }}">
+            <input type="hidden" name="dir" value="{{ $sortDir }}">
             <div class="flex flex-col sm:flex-row gap-3 items-center">
                 <div>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search part id, name, category..." class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 w-64">
@@ -86,16 +88,45 @@
         @endif
 
         <!-- Table -->
+        @php
+            $sortLink = fn($col) => request()->fullUrlWithQuery(['sort' => $col, 'dir' => ($sortBy === $col && $sortDir === 'asc') ? 'desc' : 'asc']);
+            $sortIcon = function($col) use ($sortBy, $sortDir) {
+                if ($sortBy !== $col) return '<i class="fas fa-sort ml-1 text-slate-300"></i>';
+                return $sortDir === 'asc'
+                    ? '<i class="fas fa-sort-up ml-1 text-blue-500"></i>'
+                    : '<i class="fas fa-sort-down ml-1 text-blue-500"></i>';
+            };
+        @endphp
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
-                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created On</th>
-                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part ID</th>
-                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
-                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Name</th>
-                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Detail</th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                <a href="{{ $sortLink('created_at') }}" class="flex items-center hover:text-blue-600 transition-colors">
+                                    Created On {!! $sortIcon('created_at') !!}
+                                </a>
+                            </th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                <a href="{{ $sortLink('part_id') }}" class="flex items-center hover:text-blue-600 transition-colors">
+                                    Part ID {!! $sortIcon('part_id') !!}
+                                </a>
+                            </th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                <a href="{{ $sortLink('category') }}" class="flex items-center hover:text-blue-600 transition-colors">
+                                    Category {!! $sortIcon('category') !!}
+                                </a>
+                            </th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                <a href="{{ $sortLink('part_name') }}" class="flex items-center hover:text-blue-600 transition-colors">
+                                    Part Name {!! $sortIcon('part_name') !!}
+                                </a>
+                            </th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                                <a href="{{ $sortLink('part_detail') }}" class="flex items-center hover:text-blue-600 transition-colors">
+                                    Part Detail {!! $sortIcon('part_detail') !!}
+                                </a>
+                            </th>
                             <th class="px-4 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created By</th>
                             <th class="px-4 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                         </tr>

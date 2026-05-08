@@ -26,10 +26,14 @@ class AssyPartController extends Controller
             $query->where('category', $request->category);
         }
 
-        $parts = $query->latest()->paginate(20)->withQueryString();
+        $sortable = ['created_at', 'part_id', 'category', 'part_name', 'part_detail'];
+        $sortBy  = in_array($request->sort, $sortable) ? $request->sort : 'part_id';
+        $sortDir = $request->dir === 'asc' ? 'asc' : 'desc';
+
+        $parts = $query->orderBy($sortBy, $sortDir)->paginate(20)->withQueryString();
         $categories = AssyPart::select('category')->distinct()->orderBy('category')->pluck('category');
 
-        return view('parts.index', compact('parts', 'categories'));
+        return view('parts.index', compact('parts', 'categories', 'sortBy', 'sortDir'));
     }
 
     public function create()
