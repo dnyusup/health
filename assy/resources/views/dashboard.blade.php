@@ -4,27 +4,6 @@
 
 <div class="space-y-6">
 
-    {{-- Welcome Banner --}}
-    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 p-6 shadow-lg">
-        <div class="absolute -right-10 -top-10 w-48 h-48 rounded-full bg-white/5"></div>
-        <div class="absolute -right-4 bottom-0 w-32 h-32 rounded-full bg-white/5"></div>
-        <div class="relative z-10 flex items-center justify-between">
-            <div>
-                <h2 class="text-2xl font-bold text-white">Selamat datang, {{ auth()->user()->name }}! 👋</h2>
-                <p class="text-blue-200 mt-1 text-sm">{{ now()->translatedFormat('l, d F Y') }} &mdash; Assy Part Track &amp; Trace</p>
-            </div>
-            <div class="hidden sm:flex items-center gap-3">
-                <div class="text-right">
-                    <p class="text-xs text-blue-300 uppercase tracking-widest">WO Bulan Ini</p>
-                    <p class="text-3xl font-extrabold text-white">{{ number_format($woThisMonth) }}</p>
-                </div>
-                <div class="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center">
-                    <i class="fas fa-clipboard-check text-white text-2xl"></i>
-                </div>
-            </div>
-        </div>
-    </div>
-
     {{-- Primary Stats Row --}}
     <div class="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {{-- Total WO --}}
