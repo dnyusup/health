@@ -36,16 +36,6 @@
                 <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($totalMachines) }}</p>
             </div>
         </div>
-        {{-- Total Users --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-users text-green-600 text-xl"></i>
-            </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total User</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($totalUsers) }}</p>
-            </div>
-        </div>
     </div>
 
     {{-- WO Status Cards --}}
