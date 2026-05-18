@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AssyPartController;
 use App\Http\Controllers\AssyMachineController;
 use App\Http\Controllers\AssyWorkOrderController;
+use App\Http\Controllers\AssyVendorController;
 use App\Http\Controllers\ReadyStockController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -47,6 +48,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('machines', AssyMachineController::class);
     Route::get('machines-export', [AssyMachineController::class, 'exportExcel'])->name('machines.export');
     Route::post('machines-import', [AssyMachineController::class, 'importExcel'])->name('machines.import');
+
+    // Vendors - semua user bisa full CRUD
+    Route::resource('vendors', AssyVendorController::class);
 
     // Work Orders
     Route::resource('work-orders', AssyWorkOrderController::class);
