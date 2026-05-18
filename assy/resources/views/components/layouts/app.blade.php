@@ -186,5 +186,57 @@
             </main>
         </div>
     </div>
+
+    @stack('scripts')
+
+    {{-- Floating top scrollbar for all overflow-x-auto tables --}}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        function initMirrorScrollbar(wrapper) {
+            if (!wrapper.querySelector('table')) return;
+            if (wrapper.dataset.mirrorInit) return;
+            wrapper.dataset.mirrorInit = '1';
+
+            var mirror = document.createElement('div');
+            mirror.className = 'mirror-scrollbar';
+            mirror.style.cssText = 'overflow-x:auto;overflow-y:hidden;height:10px;margin-bottom:2px;border-radius:4px;';
+
+            var spacer = document.createElement('div');
+            spacer.style.cssText = 'height:1px;';
+            mirror.appendChild(spacer);
+
+            wrapper.parentNode.insertBefore(mirror, wrapper);
+
+            function syncWidth() {
+                spacer.style.width = wrapper.scrollWidth + 'px';
+                mirror.style.display = wrapper.scrollWidth > wrapper.clientWidth ? 'block' : 'none';
+            }
+            syncWidth();
+
+            var syncing = false;
+            mirror.addEventListener('scroll', function () {
+                if (syncing) return; syncing = true;
+                wrapper.scrollLeft = mirror.scrollLeft;
+                syncing = false;
+            });
+            wrapper.addEventListener('scroll', function () {
+                if (syncing) return; syncing = true;
+                mirror.scrollLeft = wrapper.scrollLeft;
+                syncing = false;
+            });
+
+            var ro = new ResizeObserver(syncWidth);
+            ro.observe(wrapper);
+        }
+
+        document.querySelectorAll('.overflow-x-auto').forEach(initMirrorScrollbar);
+
+        // Also handle dynamically added wrappers (e.g. after Alpine re-renders)
+        var mo = new MutationObserver(function () {
+            document.querySelectorAll('.overflow-x-auto').forEach(initMirrorScrollbar);
+        });
+        mo.observe(document.body, { childList: true, subtree: true });
+    });
+    </script>
 </body>
 </html>
