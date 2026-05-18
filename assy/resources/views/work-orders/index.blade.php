@@ -107,12 +107,9 @@
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Order Number</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Order Type</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Mach Number</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Mach Type</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Pos</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part ID</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Name</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Category</th>
-                            <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Part Detail</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Kerusakan</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">PIC Bongkar</th>
                             <th class="px-3 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Remark</th>
@@ -137,12 +134,9 @@
                                 </span>
                             </td>
                             <td class="px-3 py-3 font-medium text-slate-700">{{ $wo->mach_number }}</td>
-                            <td class="px-3 py-3 text-slate-600">{{ $wo->mach_type }}</td>
                             <td class="px-3 py-3 text-slate-600">{{ $wo->pos ?: '-' }}</td>
                             <td class="px-3 py-3 font-mono text-slate-700">{{ $wo->part_id ?: '-' }}</td>
                             <td class="px-3 py-3 text-slate-700 max-w-[200px] truncate" title="{{ $wo->part_name }}">{{ $wo->part_name ?: '-' }}</td>
-                            <td class="px-3 py-3 text-slate-600">{{ $wo->category ?: '-' }}</td>
-                            <td class="px-3 py-3 text-slate-500 max-w-[200px] truncate" title="{{ $wo->part_detail }}">{{ $wo->part_detail ?: '-' }}</td>
                             <td class="px-3 py-3 text-slate-700 max-w-[160px] truncate" title="{{ $wo->kerusakan }}">{{ $wo->kerusakan ?: '-' }}</td>
                             <td class="px-3 py-3 font-medium text-slate-700">{{ $wo->pic->name ?? '-' }}</td>
                             <td class="px-3 py-3 text-slate-500 max-w-[160px] truncate" title="{{ $wo->remark }}">{{ $wo->remark ?: '-' }}</td>
