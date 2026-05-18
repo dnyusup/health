@@ -189,64 +189,33 @@
 
     @stack('scripts')
 
-    {{-- Sticky thead + floating top scrollbar + internal table scroll --}}
+    {{-- Sticky thead + internal table scroll --}}
     <style>
     .overflow-x-auto thead th {
         position: sticky;
         top: 0;
         z-index: 2;
+        background-color: #f8fafc; /* slate-50 */
     }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         function initTableScroll(wrapper) {
             if (!wrapper.querySelector('table')) return;
-            if (wrapper.dataset.mirrorInit) return;
-            wrapper.dataset.mirrorInit = '1';
+            if (wrapper.dataset.scrollInit) return;
+            wrapper.dataset.scrollInit = '1';
 
-            // --- Vertical scroll: limit height so only table rows scroll ---
-            var rect = wrapper.getBoundingClientRect();
-            var maxH = window.innerHeight - rect.top - 24; // 24px bottom breathing room
-            if (maxH > 200) {
-                wrapper.style.maxHeight = maxH + 'px';
-                wrapper.style.overflowY = 'auto';
+            function applyHeight() {
+                var rect = wrapper.getBoundingClientRect();
+                var maxH = window.innerHeight - rect.top - 24;
+                if (maxH > 200) {
+                    wrapper.style.maxHeight = maxH + 'px';
+                    wrapper.style.overflowY = 'auto';
+                }
             }
+            applyHeight();
 
-            // --- Horizontal mirror scrollbar above the table ---
-            var mirror = document.createElement('div');
-            mirror.style.cssText = 'overflow-x:auto;overflow-y:hidden;height:10px;margin-bottom:2px;border-radius:4px;';
-
-            var spacer = document.createElement('div');
-            spacer.style.cssText = 'height:1px;';
-            mirror.appendChild(spacer);
-
-            wrapper.parentNode.insertBefore(mirror, wrapper);
-
-            function syncWidth() {
-                spacer.style.width = wrapper.scrollWidth + 'px';
-                mirror.style.display = wrapper.scrollWidth > wrapper.clientWidth ? 'block' : 'none';
-            }
-            syncWidth();
-
-            var syncing = false;
-            mirror.addEventListener('scroll', function () {
-                if (syncing) return; syncing = true;
-                wrapper.scrollLeft = mirror.scrollLeft;
-                syncing = false;
-            });
-            wrapper.addEventListener('scroll', function () {
-                if (syncing) return; syncing = true;
-                mirror.scrollLeft = wrapper.scrollLeft;
-                syncing = false;
-            });
-
-            var ro = new ResizeObserver(function() {
-                syncWidth();
-                // Recalculate height on resize
-                var r = wrapper.getBoundingClientRect();
-                var h = window.innerHeight - r.top - 24;
-                if (h > 200) wrapper.style.maxHeight = h + 'px';
-            });
+            var ro = new ResizeObserver(applyHeight);
             ro.observe(wrapper);
         }
 
