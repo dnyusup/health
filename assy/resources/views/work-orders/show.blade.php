@@ -183,13 +183,20 @@
                 </button>
                 @endif
             </div>
-            {{-- Row 1: Tanggal + PIC --}}
+            {{-- Row 1: Tanggal + PIC / Vendor --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                     <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Tanggal Assembling</p>
                     <p class="text-sm font-semibold text-slate-800">{{ $work_order->tanggal_assembling->format('d/m/Y') }}</p>
                 </div>
                 <div>
+                    @if($work_order->repair_by_vendor)
+                    <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">Vendor</p>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <i class="fas fa-truck mr-1"></i>
+                        {{ $work_order->repairVendor?->vendor_name ?? '-' }}
+                    </span>
+                    @else
                     <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">PIC Assembling</p>
                     @if($picAsmNames->isNotEmpty())
                     <div class="flex flex-wrap gap-1.5">
@@ -202,8 +209,17 @@
                     @else
                     <p class="text-sm text-slate-500">-</p>
                     @endif
+                    @endif
                 </div>
             </div>
+
+            {{-- PO Number (if repair by vendor) --}}
+            @if($work_order->repair_by_vendor && $work_order->po_number)
+            <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide mb-1">PO Number</p>
+                <p class="text-sm font-semibold text-slate-800">{{ $work_order->po_number }}</p>
+            </div>
+            @endif
 
             {{-- Row 2: Action --}}
             <div>
@@ -356,47 +372,92 @@
                     @error('action_assembling') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
-                <!-- PIC Assembling: inline collapsible dropdown -->
+                <!-- PIC Assembling / Vendor toggle -->
                 <div id="picAsmWrapper">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">
-                        PIC Assembling <span class="text-red-500">*</span>
-                    </label>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-sm font-medium text-slate-700">
+                            <span id="picAsmLabel">PIC Assembling</span> <span class="text-red-500" id="picAsmRequired">*</span>
+                        </label>
+                        <!-- Repair by Vendor toggle -->
+                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                            <span class="text-xs text-slate-500 font-medium">Repair by Vendor</span>
+                            <div class="relative">
+                                <input type="checkbox" name="repair_by_vendor" id="repairByVendorToggle" value="1"
+                                       class="sr-only peer"
+                                       {{ old('repair_by_vendor', $work_order->repair_by_vendor) ? 'checked' : '' }}
+                                       onchange="handleRepairByVendorToggle(this.checked)">
+                                <div class="w-10 h-5 bg-slate-200 peer-checked:bg-amber-500 rounded-full transition-colors duration-200"></div>
+                                <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                            </div>
+                        </label>
+                    </div>
+
                     @error('pic_assembling') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
 
-                    <!-- Trigger -->
-                    <div id="picAsmTrigger"
-                         onclick="picAsmToggleDropdown(event)"
-                         class="min-h-[46px] w-full px-3 py-2 rounded-xl border border-slate-200 bg-white flex flex-wrap gap-1.5 items-center cursor-pointer hover:border-amber-400 transition-all select-none @error('pic_assembling') border-red-400 @enderror">
-                        <div id="picAsmTags" class="flex flex-wrap gap-1.5 flex-1 items-center pointer-events-none">
-                            <span id="picAsmPlaceholder" class="text-slate-400 text-sm">Pilih PIC Assembling...</span>
+                    <!-- User multi-select (default) -->
+                    <div id="picAsmUserSection">
+                        <!-- Trigger -->
+                        <div id="picAsmTrigger"
+                             onclick="picAsmToggleDropdown(event)"
+                             class="min-h-[46px] w-full px-3 py-2 rounded-xl border border-slate-200 bg-white flex flex-wrap gap-1.5 items-center cursor-pointer hover:border-amber-400 transition-all select-none @error('pic_assembling') border-red-400 @enderror">
+                            <div id="picAsmTags" class="flex flex-wrap gap-1.5 flex-1 items-center pointer-events-none">
+                                <span id="picAsmPlaceholder" class="text-slate-400 text-sm">Pilih PIC Assembling...</span>
+                            </div>
+                            <i id="picAsmChevron" class="fas fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform duration-200 pointer-events-none"></i>
                         </div>
-                        <i id="picAsmChevron" class="fas fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform duration-200 pointer-events-none"></i>
+
+                        <!-- Inline collapsible panel (in normal flow, modal scrolls) -->
+                        <div id="picAsmDropdown" class="hidden mt-1 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-md">
+                            <div class="p-2 bg-slate-50 border-b border-slate-200">
+                                <input type="text" id="picAsmSearch" placeholder="Search nama..."
+                                       oninput="picAsmFilter(this.value)"
+                                       class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
+                            </div>
+                            <ul id="picAsmList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
+                                @foreach($users as $u)
+                                <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
+                                    <button type="button"
+                                            onclick="picAsmToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
+                                            id="picAsmBtn_{{ $u->id }}"
+                                            class="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
+                                                   {{ in_array($u->id, $picAsmIds) ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
+                                        <span>{{ $u->name }}</span>
+                                        <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'invisible' }}"></i>
+                                    </button>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
+
+                        <div id="picAsmHidden"></div>
                     </div>
 
-                    <!-- Inline collapsible panel (in normal flow, modal scrolls) -->
-                    <div id="picAsmDropdown" class="hidden mt-1 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-md">
-                        <div class="p-2 bg-slate-50 border-b border-slate-200">
-                            <input type="text" id="picAsmSearch" placeholder="Search nama..."
-                                   oninput="picAsmFilter(this.value)"
-                                   class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
-                        </div>
-                        <ul id="picAsmList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
-                            @foreach($users as $u)
-                            <li class="pic-asm-item" data-name="{{ strtolower($u->name) }}">
-                                <button type="button"
-                                        onclick="picAsmToggleUser({{ $u->id }}, '{{ addslashes($u->name) }}')"
-                                        id="picAsmBtn_{{ $u->id }}"
-                                        class="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
-                                               {{ in_array($u->id, $picAsmIds) ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
-                                    <span>{{ $u->name }}</span>
-                                    <i id="picAsmCheck_{{ $u->id }}" class="fas fa-check text-amber-500 {{ in_array($u->id, $picAsmIds) ? '' : 'invisible' }}"></i>
-                                </button>
-                            </li>
+                    <!-- Vendor select (shown when Repair by Vendor = true) -->
+                    <div id="picAsmVendorSection" class="hidden">
+                        @error('repair_vendor_id') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
+                        <select name="repair_vendor_id" id="repairVendorSelect"
+                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all bg-white @error('repair_vendor_id') border-red-500 @enderror">
+                            <option value="">-- Pilih Vendor --</option>
+                            @foreach($vendors as $v)
+                            <option value="{{ $v->id }}"
+                                {{ old('repair_vendor_id', $work_order->repair_vendor_id) == $v->id ? 'selected' : '' }}>
+                                {{ $v->vendor_id }} - {{ $v->vendor_name }}
+                            </option>
                             @endforeach
-                        </ul>
+                        </select>
                     </div>
+                </div>
 
-                    <div id="picAsmHidden"></div>
+                <!-- PO Number (shown when Repair by Vendor = true) -->
+                <div id="poNumberSection" class="hidden">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                        PO Number <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="po_number" id="poNumberInput"
+                           value="{{ old('po_number', $work_order->po_number) }}"
+                           placeholder="Nomor PO dari vendor..."
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all @error('po_number') border-red-500 @enderror">
+                    @error('po_number') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
                 </div>
 
                 <!-- Remark Assembling -->
@@ -658,7 +719,41 @@ function picAsmFilter(q) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', picAsmRender);
+document.addEventListener('DOMContentLoaded', function () {
+    picAsmRender();
+    // Init toggle state (restore after validation errors or existing data)
+    const toggle = document.getElementById('repairByVendorToggle');
+    if (toggle) handleRepairByVendorToggle(toggle.checked, true);
+});
+
+// ===================== REPAIR BY VENDOR TOGGLE =====================
+function handleRepairByVendorToggle(isVendor, silent) {
+    const userSection   = document.getElementById('picAsmUserSection');
+    const vendorSection = document.getElementById('picAsmVendorSection');
+    const poSection     = document.getElementById('poNumberSection');
+    const vendorSelect  = document.getElementById('repairVendorSelect');
+    const poInput       = document.getElementById('poNumberInput');
+    const picLabel      = document.getElementById('picAsmLabel');
+
+    if (isVendor) {
+        userSection.classList.add('hidden');
+        vendorSection.classList.remove('hidden');
+        poSection.classList.remove('hidden');
+        if (picLabel) picLabel.textContent = 'Vendor';
+        if (vendorSelect) vendorSelect.required = true;
+        if (poInput) poInput.required = true;
+        // Close user dropdown if open
+        document.getElementById('picAsmDropdown')?.classList.add('hidden');
+        document.getElementById('picAsmChevron')?.classList.remove('rotate-180');
+    } else {
+        userSection.classList.remove('hidden');
+        vendorSection.classList.add('hidden');
+        poSection.classList.add('hidden');
+        if (picLabel) picLabel.textContent = 'PIC Assembling';
+        if (vendorSelect) vendorSelect.required = false;
+        if (poInput) poInput.required = false;
+    }
+}
 
 // ===================== FOTO LABEL =====================
 function updateFotoLabel(input) {

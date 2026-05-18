@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AssyVendor;
 
 class AssyWorkOrder extends Model
 {
@@ -30,6 +31,9 @@ class AssyWorkOrder extends Model
         'action_assembling',
         'pic_assembling',
         'remark_assembling',
+        'repair_by_vendor',
+        'repair_vendor_id',
+        'po_number',
         'foto_kerusakan',
         'repaired_by',
         'repaired_at',
@@ -49,6 +53,7 @@ class AssyWorkOrder extends Model
         'tanggal_bongkar'    => 'date',
         'tanggal_assembling' => 'date',
         'pic_assembling'     => 'array',
+        'repair_by_vendor'   => 'boolean',
         'repaired_at'        => 'datetime',
         'tanggal_pasang'     => 'date',
         'pic_pasang'         => 'array',
@@ -78,5 +83,10 @@ class AssyWorkOrder extends Model
     public function installedBy()
     {
         return $this->belongsTo(User::class, 'installed_by');
+    }
+
+    public function repairVendor()
+    {
+        return $this->belongsTo(AssyVendor::class, 'repair_vendor_id');
     }
 }

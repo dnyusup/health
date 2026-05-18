@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AssyMachine;
 use App\Models\AssyPart;
+use App\Models\AssyVendor;
 use App\Models\AssyWorkOrder;
 use App\Models\User;
 use App\Services\AssyWorkOrderExcelService;
@@ -93,10 +94,11 @@ class AssyWorkOrderController extends Controller
 
     public function show(AssyWorkOrder $work_order)
     {
-        $work_order->load(['machine', 'pic', 'creator', 'repairedBy', 'installedBy']);
+        $work_order->load(['machine', 'pic', 'creator', 'repairedBy', 'installedBy', 'repairVendor']);
         $users    = User::orderBy('name')->get(['id', 'name']);
         $machines = AssyMachine::orderBy('mach_number')->get(['id', 'mach_number', 'mach_type']);
-        return view('work-orders.show', compact('work_order', 'users', 'machines'));
+        $vendors  = AssyVendor::orderBy('vendor_name')->get(['id', 'vendor_id', 'vendor_name']);
+        return view('work-orders.show', compact('work_order', 'users', 'machines', 'vendors'));
     }
 
     public function edit(AssyWorkOrder $work_order)
@@ -150,21 +152,35 @@ class AssyWorkOrderController extends Controller
 
     public function repair(Request $request, AssyWorkOrder $work_order)
     {
-        $request->validate([
+        $repairByVendor = $request->boolean('repair_by_vendor');
+
+        $rules = [
             'tanggal_assembling' => 'required|date',
             'action_assembling'  => 'required|string|max:1000',
-            'pic_assembling'     => 'required|array|min:1',
-            'pic_assembling.*'   => 'exists:users,id',
             'remark_assembling'  => 'nullable|string|max:1000',
             'status'             => 'required|in:On Progress,Closed,Scrap',
-        ]);
+            'repair_by_vendor'   => 'nullable|boolean',
+        ];
+
+        if ($repairByVendor) {
+            $rules['repair_vendor_id'] = 'required|exists:assy_vendors,id';
+            $rules['po_number']        = 'required|string|max:100';
+        } else {
+            $rules['pic_assembling']   = 'required|array|min:1';
+            $rules['pic_assembling.*'] = 'exists:users,id';
+        }
+
+        $request->validate($rules);
 
         $data = [
             'tanggal_assembling' => $request->tanggal_assembling,
             'action_assembling'  => $request->action_assembling,
-            'pic_assembling'     => $request->pic_assembling,
             'remark_assembling'  => $request->remark_assembling,
             'status'             => $request->status,
+            'repair_by_vendor'   => $repairByVendor,
+            'repair_vendor_id'   => $repairByVendor ? $request->repair_vendor_id : null,
+            'po_number'          => $repairByVendor ? $request->po_number : null,
+            'pic_assembling'     => $repairByVendor ? null : $request->pic_assembling,
             'repaired_by'        => auth()->id(),
             'repaired_at'        => now(),
         ];
