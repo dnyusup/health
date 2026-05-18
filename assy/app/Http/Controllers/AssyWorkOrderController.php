@@ -288,18 +288,27 @@ class AssyWorkOrderController extends Controller
             return response()->json(['status' => null, 'order_number' => null]);
         }
 
-        $latest = AssyWorkOrder::where('part_id', $partId)
-            ->orderByDesc('created_at')
-            ->first(['status', 'order_number', 'tanggal_bongkar']);
+        $allWo = AssyWorkOrder::where('part_id', $partId)
+            ->orderByDesc('tanggal_bongkar')
+            ->get(['status', 'order_number', 'tanggal_bongkar', 'tanggal_assembling']);
 
-        if (!$latest) {
-            return response()->json(['status' => null, 'order_number' => null]);
+        if ($allWo->isEmpty()) {
+            return response()->json(['status' => null, 'order_number' => null, 'total_wo' => 0]);
         }
 
+        $latest     = $allWo->first();
+        $totalWo    = $allWo->count();
+        $totalRepair = $allWo->whereNotNull('tanggal_assembling')->count();
+
         return response()->json([
-            'status'        => $latest->status,
-            'order_number'  => $latest->order_number,
-            'tanggal_bongkar' => $latest->tanggal_bongkar?->format('d/m/Y'),
+            'status'           => $latest->status,
+            'order_number'     => $latest->order_number,
+            'tanggal_bongkar'  => $latest->tanggal_bongkar?->format('d/m/Y'),
+            'total_wo'         => $totalWo,
+            'total_repair'     => $totalRepair,
+            'last_wo_date'     => $latest->tanggal_bongkar?->format('d/m/Y'),
+            'last_wo_number'   => $latest->order_number,
+            'last_wo_status'   => $latest->status,
         ]);
     }
 }

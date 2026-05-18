@@ -167,6 +167,25 @@
                             <p class="text-sm text-red-700" id="partWoWarningText"></p>
                         </div>
                     </div>
+
+                    {{-- Part Repair History Info --}}
+                    <div id="partHistoryInfo" class="hidden p-3 rounded-xl bg-blue-50 border border-blue-200">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-history text-blue-500 mt-0.5 flex-shrink-0"></i>
+                            <div class="text-sm text-blue-800 space-y-1 w-full">
+                                <p class="font-semibold">Riwayat Part ID ini</p>
+                                <div class="flex flex-wrap gap-x-6 gap-y-1 mt-1">
+                                    <span>Total WO: <strong id="histTotalWo">0</strong></span>
+                                    <span>Sudah direpair: <strong id="histTotalRepair">0</strong> kali</span>
+                                </div>
+                                <div class="flex flex-wrap gap-x-6 gap-y-1">
+                                    <span>WO terakhir: <strong id="histLastWoNumber">-</strong></span>
+                                    <span>Tanggal: <strong id="histLastWoDate">-</strong></span>
+                                    <span id="histLastWoStatusWrap">Status: <span id="histLastWoStatus" class="font-semibold"></span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- ROW 5: Kerusakan + Remark --}}
@@ -314,6 +333,7 @@ partInput.addEventListener('input', function () {
     if (q.length < 1) {
         partDropdown.classList.add('hidden');
         document.getElementById('partWoWarning').classList.add('hidden');
+        document.getElementById('partHistoryInfo').classList.add('hidden');
         return;
     }
     partTimer = setTimeout(() => {
@@ -348,12 +368,18 @@ function selectPart(partId, partName, category, partDetail) {
 function checkPartWoStatus(partId) {
     const warning = document.getElementById('partWoWarning');
     const warningText = document.getElementById('partWoWarningText');
-    if (!partId) { warning.classList.add('hidden'); return; }
+    const historyBox = document.getElementById('partHistoryInfo');
+    if (!partId) {
+        warning.classList.add('hidden');
+        historyBox.classList.add('hidden');
+        return;
+    }
     fetch(`{{ route('api.part-wo-status') }}?part_id=${encodeURIComponent(partId)}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(r => r.json())
     .then(data => {
+        // Warning for active / scrap
         if (data.status === 'Scrap') {
             const wo = data.order_number ? ` (WO: ${data.order_number})` : '';
             const tgl = data.tanggal_bongkar ? `, dibongkar ${data.tanggal_bongkar}` : '';
@@ -368,6 +394,24 @@ function checkPartWoStatus(partId) {
             warning.classList.remove('hidden');
         } else {
             warning.classList.add('hidden');
+        }
+
+        // History info card
+        if (data.total_wo && data.total_wo > 0) {
+            document.getElementById('histTotalWo').textContent      = data.total_wo;
+            document.getElementById('histTotalRepair').textContent  = data.total_repair;
+            document.getElementById('histLastWoNumber').textContent = data.last_wo_number || '-';
+            document.getElementById('histLastWoDate').textContent   = data.last_wo_date || '-';
+            const statusEl = document.getElementById('histLastWoStatus');
+            statusEl.textContent = data.last_wo_status || '-';
+            const statusColors = {
+                'Open': 'text-emerald-600', 'On Progress': 'text-amber-600',
+                'Closed': 'text-slate-500', 'Installed': 'text-blue-600', 'Scrap': 'text-red-600'
+            };
+            statusEl.className = 'font-semibold ' + (statusColors[data.last_wo_status] || 'text-slate-700');
+            historyBox.classList.remove('hidden');
+        } else {
+            historyBox.classList.add('hidden');
         }
     });
 }
