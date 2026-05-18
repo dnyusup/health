@@ -189,16 +189,31 @@
 
     @stack('scripts')
 
-    {{-- Floating top scrollbar for all overflow-x-auto tables --}}
+    {{-- Sticky thead + floating top scrollbar + internal table scroll --}}
+    <style>
+    .overflow-x-auto thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    </style>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        function initMirrorScrollbar(wrapper) {
+        function initTableScroll(wrapper) {
             if (!wrapper.querySelector('table')) return;
             if (wrapper.dataset.mirrorInit) return;
             wrapper.dataset.mirrorInit = '1';
 
+            // --- Vertical scroll: limit height so only table rows scroll ---
+            var rect = wrapper.getBoundingClientRect();
+            var maxH = window.innerHeight - rect.top - 24; // 24px bottom breathing room
+            if (maxH > 200) {
+                wrapper.style.maxHeight = maxH + 'px';
+                wrapper.style.overflowY = 'auto';
+            }
+
+            // --- Horizontal mirror scrollbar above the table ---
             var mirror = document.createElement('div');
-            mirror.className = 'mirror-scrollbar';
             mirror.style.cssText = 'overflow-x:auto;overflow-y:hidden;height:10px;margin-bottom:2px;border-radius:4px;';
 
             var spacer = document.createElement('div');
@@ -225,15 +240,20 @@
                 syncing = false;
             });
 
-            var ro = new ResizeObserver(syncWidth);
+            var ro = new ResizeObserver(function() {
+                syncWidth();
+                // Recalculate height on resize
+                var r = wrapper.getBoundingClientRect();
+                var h = window.innerHeight - r.top - 24;
+                if (h > 200) wrapper.style.maxHeight = h + 'px';
+            });
             ro.observe(wrapper);
         }
 
-        document.querySelectorAll('.overflow-x-auto').forEach(initMirrorScrollbar);
+        document.querySelectorAll('.overflow-x-auto').forEach(initTableScroll);
 
-        // Also handle dynamically added wrappers (e.g. after Alpine re-renders)
         var mo = new MutationObserver(function () {
-            document.querySelectorAll('.overflow-x-auto').forEach(initMirrorScrollbar);
+            document.querySelectorAll('.overflow-x-auto').forEach(initTableScroll);
         });
         mo.observe(document.body, { childList: true, subtree: true });
     });
