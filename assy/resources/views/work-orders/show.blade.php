@@ -378,18 +378,18 @@
                         <label class="block text-sm font-medium text-slate-700">
                             <span id="picAsmLabel">PIC Assembling</span> <span class="text-red-500" id="picAsmRequired">*</span>
                         </label>
-                        <!-- Repair by Vendor toggle -->
-                        <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                        <!-- Repair by Vendor toggle (inline styled, no build needed) -->
+                        <div class="inline-flex items-center gap-2 cursor-pointer select-none" onclick="document.getElementById('repairByVendorToggle').click()">
                             <span class="text-xs text-slate-500 font-medium">Repair by Vendor</span>
-                            <div class="relative">
+                            <div style="position:relative;width:40px;height:22px;flex-shrink:0;">
                                 <input type="checkbox" name="repair_by_vendor" id="repairByVendorToggle" value="1"
-                                       class="sr-only peer"
+                                       style="position:absolute;opacity:0;width:0;height:0;"
                                        {{ old('repair_by_vendor', $work_order->repair_by_vendor) ? 'checked' : '' }}
                                        onchange="handleRepairByVendorToggle(this.checked)">
-                                <div class="w-10 h-5 bg-slate-200 peer-checked:bg-amber-500 rounded-full transition-colors duration-200"></div>
-                                <div class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                                <div id="vendorToggleTrack" style="width:40px;height:22px;border-radius:11px;background:#e2e8f0;transition:background 0.2s;position:relative;"></div>
+                                <div id="vendorToggleThumb" style="position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:white;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:transform 0.2s;"></div>
                             </div>
-                        </label>
+                        </div>
                     </div>
 
                     @error('pic_assembling') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
@@ -432,19 +432,41 @@
                         <div id="picAsmHidden"></div>
                     </div>
 
-                    <!-- Vendor select (shown when Repair by Vendor = true) -->
+                    <!-- Vendor searchable dropdown (shown when Repair by Vendor = true) -->
                     <div id="picAsmVendorSection" class="hidden">
                         @error('repair_vendor_id') <p class="mb-1 text-xs text-red-500">{{ $message }}</p> @enderror
-                        <select name="repair_vendor_id" id="repairVendorSelect"
-                                class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none transition-all bg-white @error('repair_vendor_id') border-red-500 @enderror">
-                            <option value="">-- Pilih Vendor --</option>
-                            @foreach($vendors as $v)
-                            <option value="{{ $v->id }}"
-                                {{ old('repair_vendor_id', $work_order->repair_vendor_id) == $v->id ? 'selected' : '' }}>
-                                {{ $v->vendor_id }} - {{ $v->vendor_name }}
-                            </option>
-                            @endforeach
-                        </select>
+                        {{-- Hidden input carries the actual vendor id --}}
+                        <input type="hidden" name="repair_vendor_id" id="repairVendorId"
+                               value="{{ old('repair_vendor_id', $work_order->repair_vendor_id) }}">
+                        <!-- Trigger -->
+                        <div id="vendorTrigger"
+                             onclick="vendorToggleDropdown(event)"
+                             class="min-h-[46px] w-full px-3 py-2 rounded-xl border border-slate-200 bg-white flex items-center cursor-pointer hover:border-amber-400 transition-all select-none @error('repair_vendor_id') border-red-400 @enderror">
+                            <span id="vendorSelected" class="flex-1 text-sm text-slate-400">Pilih Vendor...</span>
+                            <i id="vendorChevron" class="fas fa-chevron-down text-slate-400 text-xs flex-shrink-0 transition-transform duration-200"></i>
+                        </div>
+                        <!-- Inline collapsible panel -->
+                        <div id="vendorDropdown" class="hidden mt-1 border border-slate-200 rounded-xl overflow-hidden bg-white shadow-md">
+                            <div class="p-2 bg-slate-50 border-b border-slate-200">
+                                <input type="text" id="vendorSearch" placeholder="Search vendor..."
+                                       oninput="vendorFilter(this.value)"
+                                       class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 outline-none focus:border-amber-500 bg-white">
+                            </div>
+                            <ul id="vendorList" class="max-h-36 overflow-y-auto divide-y divide-slate-50">
+                                @foreach($vendors as $v)
+                                <li class="vendor-item" data-name="{{ strtolower($v->vendor_id.' '.$v->vendor_name) }}">
+                                    <button type="button"
+                                            onclick="vendorSelect({{ $v->id }}, '{{ addslashes($v->vendor_id) }} - {{ addslashes($v->vendor_name) }}')"
+                                            id="vendorBtn_{{ $v->id }}"
+                                            class="w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between
+                                                   {{ old('repair_vendor_id', $work_order->repair_vendor_id) == $v->id ? 'bg-amber-50 text-amber-800 font-medium' : 'text-slate-700 hover:bg-slate-50' }}">
+                                        <span><span class="font-medium">{{ $v->vendor_id }}</span> &mdash; {{ $v->vendor_name }}</span>
+                                        <i id="vendorCheck_{{ $v->id }}" class="fas fa-check text-amber-500 {{ old('repair_vendor_id', $work_order->repair_vendor_id) == $v->id ? '' : 'invisible' }}"></i>
+                                    </button>
+                                </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -723,15 +745,23 @@ document.addEventListener('DOMContentLoaded', function () {
     picAsmRender();
     // Init toggle state (restore after validation errors or existing data)
     const toggle = document.getElementById('repairByVendorToggle');
-    if (toggle) handleRepairByVendorToggle(toggle.checked, true);
+    if (toggle) {
+        handleRepairByVendorToggle(toggle.checked, true);
+        if (toggle.checked) vendorRenderSelected();
+    }
 });
 
 // ===================== REPAIR BY VENDOR TOGGLE =====================
 function handleRepairByVendorToggle(isVendor, silent) {
+    const track  = document.getElementById('vendorToggleTrack');
+    const thumb  = document.getElementById('vendorToggleThumb');
+    if (track) track.style.background = isVendor ? '#f59e0b' : '#e2e8f0';
+    if (thumb) thumb.style.transform  = isVendor ? 'translateX(18px)' : 'translateX(0)';
+
     const userSection   = document.getElementById('picAsmUserSection');
     const vendorSection = document.getElementById('picAsmVendorSection');
     const poSection     = document.getElementById('poNumberSection');
-    const vendorSelect  = document.getElementById('repairVendorSelect');
+    const vendorIdInput = document.getElementById('repairVendorId');
     const poInput       = document.getElementById('poNumberInput');
     const picLabel      = document.getElementById('picAsmLabel');
 
@@ -740,20 +770,102 @@ function handleRepairByVendorToggle(isVendor, silent) {
         vendorSection.classList.remove('hidden');
         poSection.classList.remove('hidden');
         if (picLabel) picLabel.textContent = 'Vendor';
-        if (vendorSelect) vendorSelect.required = true;
         if (poInput) poInput.required = true;
         // Close user dropdown if open
         document.getElementById('picAsmDropdown')?.classList.add('hidden');
         document.getElementById('picAsmChevron')?.classList.remove('rotate-180');
+        // Init vendor display label from current value
+        if (!silent) { vendorRenderSelected(); }
     } else {
         userSection.classList.remove('hidden');
         vendorSection.classList.add('hidden');
         poSection.classList.add('hidden');
         if (picLabel) picLabel.textContent = 'PIC Assembling';
-        if (vendorSelect) vendorSelect.required = false;
         if (poInput) poInput.required = false;
+        // Close vendor dropdown if open
+        document.getElementById('vendorDropdown')?.classList.add('hidden');
+        document.getElementById('vendorChevron')?.classList.remove('rotate-180');
     }
 }
+
+// ===================== VENDOR SEARCHABLE DROPDOWN =====================
+function vendorRenderSelected() {
+    const id  = document.getElementById('repairVendorId')?.value;
+    const lbl = document.getElementById('vendorSelected');
+    if (!lbl) return;
+    if (id) {
+        const btn = document.getElementById('vendorBtn_' + id);
+        lbl.textContent = btn ? btn.querySelector('span').textContent.trim() : 'Pilih Vendor...';
+        lbl.classList.remove('text-slate-400');
+        lbl.classList.add('text-slate-700');
+    } else {
+        lbl.textContent = 'Pilih Vendor...';
+        lbl.classList.add('text-slate-400');
+        lbl.classList.remove('text-slate-700');
+    }
+}
+
+function vendorToggleDropdown(e) {
+    e.stopPropagation();
+    const dropdown = document.getElementById('vendorDropdown');
+    const chevron  = document.getElementById('vendorChevron');
+    const isHidden = dropdown.classList.contains('hidden');
+    if (isHidden) {
+        dropdown.classList.remove('hidden');
+        chevron?.classList.add('rotate-180');
+        const search = document.getElementById('vendorSearch');
+        if (search) { search.value = ''; vendorFilter(''); setTimeout(() => search.focus(), 50); }
+    } else {
+        dropdown.classList.add('hidden');
+        chevron?.classList.remove('rotate-180');
+    }
+}
+
+function vendorSelect(id, label) {
+    // Clear previous selection
+    document.querySelectorAll('.vendor-item button').forEach(btn => {
+        btn.classList.remove('bg-amber-50', 'text-amber-800', 'font-medium');
+        btn.classList.add('text-slate-700');
+    });
+    document.querySelectorAll('[id^="vendorCheck_"]').forEach(i => i.classList.add('invisible'));
+
+    // Set new
+    document.getElementById('repairVendorId').value = id;
+    const btn   = document.getElementById('vendorBtn_' + id);
+    const check = document.getElementById('vendorCheck_' + id);
+    btn?.classList.add('bg-amber-50', 'text-amber-800', 'font-medium');
+    btn?.classList.remove('text-slate-700');
+    check?.classList.remove('invisible');
+
+    // Update trigger label
+    const lbl = document.getElementById('vendorSelected');
+    if (lbl) {
+        lbl.textContent = label;
+        lbl.classList.remove('text-slate-400');
+        lbl.classList.add('text-slate-700');
+    }
+
+    // Close dropdown
+    document.getElementById('vendorDropdown').classList.add('hidden');
+    document.getElementById('vendorChevron')?.classList.remove('rotate-180');
+}
+
+function vendorFilter(q) {
+    document.querySelectorAll('.vendor-item').forEach(item => {
+        item.style.display = item.dataset.name.includes(q.toLowerCase()) ? '' : 'none';
+    });
+}
+
+// Close vendor dropdown when clicking outside
+document.addEventListener('click', function(e) {
+    const wrapper  = document.getElementById('picAsmVendorSection');
+    const dropdown = document.getElementById('vendorDropdown');
+    if (!dropdown || dropdown.classList.contains('hidden')) return;
+    if (!wrapper || !wrapper.contains(e.target)) {
+        dropdown.classList.add('hidden');
+        document.getElementById('vendorChevron')?.classList.remove('rotate-180');
+    }
+});
 
 // ===================== FOTO LABEL =====================
 function updateFotoLabel(input) {
