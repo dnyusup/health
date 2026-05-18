@@ -42,17 +42,21 @@
                     <span>Export Excel</span>
                 </a>
                 <!-- Import -->
+                @if(auth()->user()->hasAssypartRole())
                 <button type="button" onclick="document.getElementById('importModal').classList.remove('hidden')"
                         class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium hover:bg-amber-100 transition-all">
                     <i class="fas fa-file-upload"></i>
                     <span>Import Excel</span>
                 </button>
+                @endif
                 <!-- Add Machine -->
+                @if(auth()->user()->hasAssypartRole())
                 <a href="{{ route('machines.create') }}"
                    class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25">
                     <i class="fas fa-plus"></i>
                     <span>Add Machine</span>
                 </a>
+                @endif
         </div>
 
         <!-- Messages -->

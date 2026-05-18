@@ -29,11 +29,13 @@ class AssyVendorController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->hasAssypartRole(), 403, 'Anda tidak memiliki akses untuk menambahkan data.');
         return view('vendors.create');
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasAssypartRole(), 403, 'Anda tidak memiliki akses untuk menambahkan data.');
         $request->validate([
             'vendor_id'   => 'required|string|max:50|unique:assy_vendors,vendor_id',
             'vendor_name' => 'required|string|max:150',

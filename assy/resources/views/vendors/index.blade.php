@@ -24,10 +24,12 @@
 
         <!-- Actions -->
         <div class="flex items-center gap-3 flex-wrap justify-end">
+            @if(auth()->user()->hasAssypartRole())
             <a href="{{ route('vendors.create') }}"
                class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-medium hover:from-blue-600 hover:to-blue-700 transition-all shadow-lg shadow-blue-500/25">
                 <i class="fas fa-plus"></i> Add Vendor
             </a>
+            @endif
         </div>
 
         <!-- Messages -->

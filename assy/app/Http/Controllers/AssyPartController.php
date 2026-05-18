@@ -38,12 +38,14 @@ class AssyPartController extends Controller
 
     public function create()
     {
+        abort_if(!auth()->user()->hasAssypartRole(), 403, 'Anda tidak memiliki akses untuk menambahkan data.');
         $categories = AssyPart::select('category')->distinct()->orderBy('category')->pluck('category');
         return view('parts.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
+        abort_if(!auth()->user()->hasAssypartRole(), 403, 'Anda tidak memiliki akses untuk menambahkan data.');
         $request->validate([
             'part_id'     => 'required|string|max:50|unique:assy_parts,part_id',
             'category'    => 'required|string|max:100',
@@ -110,6 +112,7 @@ class AssyPartController extends Controller
 
     public function importExcel(Request $request, AssyPartExcelService $service)
     {
+        abort_if(!auth()->user()->hasAssypartRole(), 403, 'Anda tidak memiliki akses untuk mengimpor data.');
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls|max:51200',
         ]);

@@ -60,6 +60,11 @@ class User extends Authenticatable
         return $this->role === 'user';
     }
 
+    public function hasAssypartRole(): bool
+    {
+        return !empty($this->role_assypart);
+    }
+
     public function assypartRoleLabel(): string
     {
         return match($this->role_assypart) {
