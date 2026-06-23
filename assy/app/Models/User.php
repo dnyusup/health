@@ -18,7 +18,6 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'role_assypart',
     ];
 
     protected $hidden = [
@@ -37,41 +36,13 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Check if user is admin
-     */
     public function isAdmin(): bool
     {
-        return $this->role_assypart === 'admin';
-    }
-
-    public function isShopfloor(): bool
-    {
-        return $this->role_assypart === 'tech_shopfloor';
-    }
-
-    public function isWorkshop(): bool
-    {
-        return $this->role_assypart === 'tech_workshop';
+        return $this->role === 'admin';
     }
 
     public function isUser(): bool
     {
         return $this->role === 'user';
-    }
-
-    public function hasAssypartRole(): bool
-    {
-        return !empty($this->role_assypart);
-    }
-
-    public function assypartRoleLabel(): string
-    {
-        return match($this->role_assypart) {
-            'admin'          => 'Admin',
-            'tech_shopfloor' => 'Tech Shopfloor',
-            'tech_workshop'  => 'Tech Workshop',
-            default          => '-',
-        };
     }
 }

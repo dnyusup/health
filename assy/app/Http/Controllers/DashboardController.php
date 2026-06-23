@@ -2,22 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AssyMachine;
-use App\Models\AssyPart;
-use App\Models\AssyWorkOrder;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Summary counts
-        $totalUsers    = User::count();
-        $totalParts    = AssyPart::count();
-        $totalMachines = AssyMachine::count();
-        $totalWO       = AssyWorkOrder::count();
+        $totalUsers = User::count();
+        $totalAdmins = User::where('role', 'admin')->count();
+
+        return view('dashboard', compact('totalUsers', 'totalAdmins'));
+    }
+}
 
         // Work Order by status
         $woByStatus = AssyWorkOrder::select('status', DB::raw('count(*) as total'))

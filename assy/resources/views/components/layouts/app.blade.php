@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'Assy Part' }} - Assy Part Track &amp; Trace</title>
+    <title>{{ $title ?? 'App' }} - Web Application</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(["resources/css/app.css", "resources/js/app.js"])
 </head>
@@ -39,7 +39,7 @@
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
                         <i class="fas fa-cogs text-white text-lg"></i>
                     </div>
-                    <span class="text-2xl font-bold logo-text">Assy Part</span>
+                    <span class="text-2xl font-bold logo-text">App Template</span>
                 </div>
                 <button @click="sidebarOpen = false" class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center text-slate-400 hover:bg-slate-600 hover:text-white transition-all">
                     <i class="fas fa-times"></i>
@@ -62,8 +62,8 @@
                             <i class="fas fa-cogs text-white text-xl"></i>
                         </div>
                         <div>
-                            <span class="text-2xl font-bold logo-text">Assy Part</span>
-                            <p class="text-[10px] text-slate-500 tracking-wider uppercase">Assy Part Track &amp; Trace</p>
+                        <span class="text-2xl font-bold logo-text">App Template</span>
+                        <p class="text-[10px] text-slate-500 tracking-wider uppercase">Laravel Web Template</p>
                         </div>
                     </div>
                 </div>

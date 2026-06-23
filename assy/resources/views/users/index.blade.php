@@ -10,11 +10,10 @@
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name, user id, email..." class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500 w-64">
                         </div>
                         <div>
-                            <select name="role_assypart" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            <select name="role" class="rounded-lg border border-slate-300 px-3 py-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">All Roles</option>
-                                <option value="admin" {{ request('role_assypart')==='admin' ? 'selected' : '' }}>Admin</option>
-                                <option value="tech_shopfloor" {{ request('role_assypart')==='tech_shopfloor' ? 'selected' : '' }}>Tech Shopfloor</option>
-                                <option value="tech_workshop" {{ request('role_assypart')==='tech_workshop' ? 'selected' : '' }}>Tech Workshop</option>
+                                <option value="admin" {{ request('role')==='admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="user" {{ request('role')==='user' ? 'selected' : '' }}>User</option>
                             </select>
                         </div>
                         <div>
@@ -22,7 +21,7 @@
                                 <i class="fas fa-search"></i> <span>Filter</span>
                             </button>
                         </div>
-                        @if(request('search') || request('role_assypart'))
+                        @if(request('search') || request('role'))
                         <div>
                             <a href="{{ route('users.index') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all">
                                 <i class="fas fa-times"></i> <span>Reset</span>
@@ -89,20 +88,14 @@
                             </td>
                             <td class="px-6 py-4 text-slate-600">{{ $user->email ?? '-' }}</td>
                             <td class="px-6 py-4">
-                                @if($user->role_assypart === 'admin')
+                                @if($user->isAdmin())
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
                                     <i class="fas fa-star text-[9px]"></i> Admin
                                 </span>
-                                @elseif($user->role_assypart === 'tech_shopfloor')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                                    <i class="fas fa-industry text-[9px]"></i> Tech Shopfloor
-                                </span>
-                                @elseif($user->role_assypart === 'tech_workshop')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                                    <i class="fas fa-wrench text-[9px]"></i> Tech Workshop
-                                </span>
                                 @else
-                                <span class="text-slate-400 text-xs">-</span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                    <i class="fas fa-user text-[9px]"></i> User
+                                </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-slate-500 text-sm">{{ $user->created_at->format('d M Y') }}</td>

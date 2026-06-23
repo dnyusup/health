@@ -44,20 +44,14 @@
                 </div>
                 <div>
                     <p class="text-sm text-slate-500 mb-1">Role</p>
-                    @if($user->role_assypart === 'admin')
+                    @if($user->isAdmin())
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
                         <i class="fas fa-star text-xs"></i> Admin
                     </span>
-                    @elseif($user->role_assypart === 'tech_shopfloor')
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
-                        <i class="fas fa-industry text-xs"></i> Tech Shopfloor
-                    </span>
-                    @elseif($user->role_assypart === 'tech_workshop')
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
-                        <i class="fas fa-wrench text-xs"></i> Tech Workshop
-                    </span>
                     @else
-                    <span class="text-slate-400 text-sm">-</span>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
+                        <i class="fas fa-user text-xs"></i> User
+                    </span>
                     @endif
                 </div>
                 <div>

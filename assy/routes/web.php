@@ -4,11 +4,6 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\AssyPartController;
-use App\Http\Controllers\AssyMachineController;
-use App\Http\Controllers\AssyWorkOrderController;
-use App\Http\Controllers\AssyVendorController;
-use App\Http\Controllers\ReadyStockController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -38,31 +33,6 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
-
-    // Parts - semua user bisa full CRUD
-    Route::resource('parts', AssyPartController::class);
-    Route::get('parts-export', [AssyPartController::class, 'exportExcel'])->name('parts.export');
-    Route::post('parts-import', [AssyPartController::class, 'importExcel'])->name('parts.import');
-
-    // Machines - semua user bisa full CRUD
-    Route::resource('machines', AssyMachineController::class);
-    Route::get('machines-export', [AssyMachineController::class, 'exportExcel'])->name('machines.export');
-    Route::post('machines-import', [AssyMachineController::class, 'importExcel'])->name('machines.import');
-
-    // Vendors - semua user bisa full CRUD
-    Route::resource('vendors', AssyVendorController::class);
-
-    // Work Orders
-    Route::resource('work-orders', AssyWorkOrderController::class);
-    Route::get('work-orders-export', [AssyWorkOrderController::class, 'exportExcel'])->name('work-orders.export');
-    Route::post('work-orders-import', [AssyWorkOrderController::class, 'importExcel'])->name('work-orders.import');
-    Route::post('work-orders/{work_order}/repair', [AssyWorkOrderController::class, 'repair'])->name('work-orders.repair');
-    Route::post('work-orders/{work_order}/install', [AssyWorkOrderController::class, 'install'])->name('work-orders.install');
-    Route::get('api/part-lookup', [AssyWorkOrderController::class, 'partLookup'])->name('api.part-lookup');
-    Route::get('api/part-wo-status', [AssyWorkOrderController::class, 'partWoStatus'])->name('api.part-wo-status');
-
-    // Ready Stock
-    Route::get('ready-stock', [ReadyStockController::class, 'index'])->name('ready-stock.index');
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {

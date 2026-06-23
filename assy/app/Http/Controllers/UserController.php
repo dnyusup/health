@@ -21,22 +21,17 @@ class UserController extends Controller
             $query->where('role', request('role'));
         }
 
-        // Filter by role_assypart
-        if (request('role_assypart')) {
-            $query->where('role_assypart', request('role_assypart'));
-        }
-
         // Search by name, user_id, or email
         if ($search = request('search')) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                   ->orWhere('user_id', 'like', "%$search%")
-                  ->orWhere('email', 'like', "%$search%") ;
+                  ->orWhere('email', 'like', "%$search%");
             });
         }
 
         $users = $query
-            ->orderByRaw("CASE WHEN role_assypart = 'admin' THEN 1 WHEN role_assypart = 'tech_shopfloor' THEN 2 WHEN role_assypart = 'tech_workshop' THEN 3 ELSE 4 END")
+            ->orderByRaw("CASE WHEN role = 'admin' THEN 1 ELSE 2 END")
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();
@@ -61,11 +56,10 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'password' => 'required|string|min:6|confirmed',
-            'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
+            'role' => 'required|in:admin,user',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
-        $validated['role'] = 'user'; // auto-set, tidak diekspos ke form
 
         User::create($validated);
 
@@ -99,7 +93,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'password' => 'nullable|string|min:6|confirmed',
-            'role_assypart' => 'nullable|in:admin,tech_shopfloor,tech_workshop',
+            'role' => 'required|in:admin,user',
         ]);
 
         if (empty($validated['password'])) {
