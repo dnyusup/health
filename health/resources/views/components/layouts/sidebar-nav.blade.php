@@ -1,29 +1,29 @@
 <nav class="flex flex-1 flex-col mt-6">
     <ul role="list" class="flex flex-1 flex-col gap-y-7">
         <li>
-            <p class="px-3 text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Main Menu</p>
+            <p class="px-3 text-[11px] font-semibold text-slate-300 uppercase tracking-widest mb-3">Main Menu</p>
             <ul role="list" class="-mx-2 space-y-2">
                 <li>
                     <a href="{{ route('dashboard') }}" 
-                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium {{ request()->routeIs('dashboard') ? 'active text-white' : 'text-slate-400 hover:text-white' }}">
+                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold {{ request()->routeIs('dashboard') ? 'active text-white' : 'text-slate-200 hover:text-white' }}">
                         <span class="nav-icon w-10 h-10 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-blue-500/20' : 'bg-slate-700/50 group-hover:bg-slate-600' }} flex items-center justify-center transition-all">
                             <i class="fas fa-home text-lg {{ request()->routeIs('dashboard') ? 'text-blue-400' : '' }}"></i>
                         </span>
                         <span class="flex flex-col justify-center">
                             <span>Dashboard</span>
-                            <span class="text-[10px] text-slate-500 font-normal">Overview & Stats</span>
+                            <span class="text-[10px] text-slate-400 font-normal">Overview & Stats</span>
                         </span>
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('health-checks.index') }}" 
-                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium {{ request()->routeIs('health-checks.*') ? 'active text-white' : 'text-slate-400 hover:text-white' }}">
+                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold {{ request()->routeIs('health-checks.*') ? 'active text-white' : 'text-slate-200 hover:text-white' }}">
                         <span class="nav-icon w-10 h-10 rounded-lg {{ request()->routeIs('health-checks.*') ? 'bg-green-500/20' : 'bg-slate-700/50 group-hover:bg-slate-600' }} flex items-center justify-center transition-all">
                             <i class="fas fa-heartbeat text-lg {{ request()->routeIs('health-checks.*') ? 'text-green-400' : '' }}"></i>
                         </span>
                         <span class="flex flex-col justify-center">
                             <span>Health Monitoring</span>
-                            <span class="text-[10px] text-slate-500 font-normal">Data kesehatan</span>
+                            <span class="text-[10px] text-slate-400 font-normal">Data kesehatan</span>
                         </span>
                     </a>
                 </li>
@@ -31,17 +31,17 @@
         </li>
         @if(auth()->user()->isAdmin())
         <li>
-            <p class="px-3 text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Administration</p>
+            <p class="px-3 text-[11px] font-semibold text-slate-300 uppercase tracking-widest mb-3">Administration</p>
             <ul role="list" class="-mx-2 space-y-2">
                 <li>
                     <a href="{{ route('users.index') }}" 
-                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium {{ request()->routeIs('users.*') ? 'active text-white' : 'text-slate-400 hover:text-white' }}">
+                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold {{ request()->routeIs('users.*') ? 'active text-white' : 'text-slate-200 hover:text-white' }}">
                         <span class="nav-icon w-10 h-10 rounded-lg {{ request()->routeIs('users.*') ? 'bg-blue-500/20' : 'bg-slate-700/50 group-hover:bg-slate-600' }} flex items-center justify-center transition-all">
                             <i class="fas fa-users-cog text-lg {{ request()->routeIs('users.*') ? 'text-blue-400' : '' }}"></i>
                         </span>
                         <span class="flex flex-col justify-center">
                             <span>User Management</span>
-                            <span class="text-[10px] text-slate-500 font-normal">Manage accounts</span>
+                            <span class="text-[10px] text-slate-400 font-normal">Manage accounts</span>
                         </span>
                     </a>
                 </li>
@@ -49,17 +49,17 @@
         </li>
         @endif
         <li>
-            <p class="px-3 text-[11px] font-semibold text-slate-500 uppercase tracking-widest mb-3">Account</p>
+            <p class="px-3 text-[11px] font-semibold text-slate-300 uppercase tracking-widest mb-3">Account</p>
             <ul role="list" class="-mx-2 space-y-2">
                 <li>
                     <a href="{{ route('profile.show') }}" 
-                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium {{ request()->routeIs('profile.*') ? 'active text-white' : 'text-slate-400 hover:text-white' }}">
+                       class="nav-item group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold {{ request()->routeIs('profile.*') ? 'active text-white' : 'text-slate-200 hover:text-white' }}">
                         <span class="nav-icon w-10 h-10 rounded-lg {{ request()->routeIs('profile.*') ? 'bg-blue-500/20' : 'bg-slate-700/50 group-hover:bg-slate-600' }} flex items-center justify-center transition-all">
                             <i class="fas fa-user-circle text-lg {{ request()->routeIs('profile.*') ? 'text-blue-400' : '' }}"></i>
                         </span>
                         <span class="flex flex-col justify-center">
                             <span>My Profile</span>
-                            <span class="text-[10px] text-slate-500 font-normal">View & edit profile</span>
+                            <span class="text-[10px] text-slate-400 font-normal">View & edit profile</span>
                         </span>
                     </a>
                 </li>
