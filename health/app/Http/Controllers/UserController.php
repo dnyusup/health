@@ -31,7 +31,7 @@ class UserController extends Controller
         }
 
         $users = $query
-            ->orderByRaw("CASE WHEN role = 'admin' THEN 1 ELSE 2 END")
+            ->orderByRaw("CASE WHEN role_mtnhealth = 'admin' THEN 1 ELSE 2 END")
             ->orderBy('name')
             ->paginate(10)
             ->withQueryString();

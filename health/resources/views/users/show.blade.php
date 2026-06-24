@@ -25,7 +25,7 @@
 
         <!-- User Info Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div class="p-6 bg-gradient-to-r {{ $user->isAdmin() ? 'from-amber-500 to-orange-500' : 'from-slate-500 to-slate-600' }}">
+            <div class="p-6 bg-gradient-to-r {{ $user->role_mtnhealth === 'admin' ? 'from-amber-500 to-orange-500' : 'from-slate-500 to-slate-600' }}">
                 <div class="flex items-center gap-4">
                     <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-white text-2xl font-bold">
                         {{ strtoupper(substr($user->name, 0, 2)) }}

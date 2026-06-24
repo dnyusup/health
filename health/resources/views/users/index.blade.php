@@ -77,7 +77,7 @@
                         <tr class="hover:bg-slate-50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $user->isAdmin() ? 'from-amber-400 to-orange-500' : 'from-slate-400 to-slate-500' }} flex items-center justify-center text-white font-semibold">
+                                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $user->role_mtnhealth === 'admin' ? 'from-amber-400 to-orange-500' : 'from-slate-400 to-slate-500' }} flex items-center justify-center text-white font-semibold">
                                         {{ strtoupper(substr($user->name, 0, 2)) }}
                                     </div>
                                     <span class="font-medium text-slate-800">{{ $user->name }}</span>
