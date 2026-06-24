@@ -72,22 +72,7 @@
                     @enderror
                 </div>
 
-                <!-- Role -->
-                <div>
-                    <label for="role" class="block text-sm font-medium text-slate-700 mb-2">
-                        Role <span class="text-red-500">*</span>
-                    </label>
-                    <select id="role" 
-                            name="role" 
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('role') border-red-500 @enderror"
-                            required>
-                        <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
-                        <option value="user" {{ old('role', $user->role) == 'user' ? 'selected' : '' }}>User</option>
-                    </select>
-                    @error('role')
-                    <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
-                    @enderror
-                </div>
+                <input type="hidden" name="role" value="{{ $user->role }}">
 
                 <!-- Role MTN Health -->
                 <div>

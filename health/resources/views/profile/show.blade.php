@@ -8,31 +8,23 @@
             <div class="lg:col-span-1">
                 <div class="bg-white shadow rounded-lg overflow-hidden">
                     <div class="bg-gradient-to-br from-slate-700 to-slate-900 px-6 py-8 text-center">
-                        <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br {{ $user->isAdmin() ? 'from-amber-500 to-orange-500' : 'from-blue-500 to-blue-600' }} flex items-center justify-center shadow-lg mb-4">
+                        <div class="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg mb-4">
                             <span class="text-white text-3xl font-bold">{{ strtoupper(substr($user->name, 0, 2)) }}</span>
                         </div>
                         <h2 class="text-xl font-bold text-white">{{ $user->name }}</h2>
                         <p class="text-slate-400 text-sm mt-1">{{ $user->email }}</p>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mt-3 {{ $user->isAdmin() ? 'bg-amber-500/20 text-amber-300' : 'bg-blue-500/20 text-blue-300' }}">
-                            <i class="fas {{ $user->isAdmin() ? 'fa-shield-alt' : 'fa-user' }} mr-1"></i>
-                            {{ $user->isAdmin() ? 'Administrator' : 'User' }}
+                        @if($user->role_mtnhealth)
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium mt-3 bg-green-500/20 text-green-300">
+                            <i class="fas fa-heartbeat mr-1"></i>
+                            {{ ucfirst($user->role_mtnhealth) }}
                         </span>
+                        @endif
                     </div>
                     <div class="px-6 py-4">
                         <dl class="divide-y divide-gray-100">
                             <div class="py-3 flex justify-between">
                                 <dt class="text-sm text-gray-500">User ID</dt>
                                 <dd class="text-sm font-mono text-gray-900">{{ $user->user_id }}</dd>
-                            </div>
-                            <div class="py-3 flex justify-between">
-                                <dt class="text-sm text-gray-500">Role</dt>
-                                <dd class="text-sm text-gray-900">
-                                    @if($user->isAdmin())
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700"><i class="fas fa-star text-[9px]"></i> Admin</span>
-                                    @else
-                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600"><i class="fas fa-user text-[9px]"></i> User</span>
-                                    @endif
-                                </dd>
                             </div>
                             <div class="py-3 flex justify-between">
                                 <dt class="text-sm text-gray-500">Role MTN Health</dt>

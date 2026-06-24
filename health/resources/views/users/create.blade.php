@@ -71,6 +71,8 @@
                     @enderror
                 </div>
 
+                <input type="hidden" name="role" value="user">
+
                 <!-- Role Mtnhealth -->
                 <div>
                     <label for="role_mtnhealth" class="block text-sm font-medium text-slate-700 mb-2">

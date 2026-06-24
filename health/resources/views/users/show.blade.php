@@ -43,18 +43,6 @@
                     <p class="text-slate-800 font-medium">{{ $user->email ?? 'Not set' }}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-slate-500 mb-1">Role</p>
-                    @if($user->isAdmin())
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-700">
-                        <i class="fas fa-star text-xs"></i> Admin
-                    </span>
-                    @else
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-600">
-                        <i class="fas fa-user text-xs"></i> User
-                    </span>
-                    @endif
-                </div>
-                <div>
                     <p class="text-sm text-slate-500 mb-1">Role MTN Health</p>
                     @if($user->role_mtnhealth)
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
