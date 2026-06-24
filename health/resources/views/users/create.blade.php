@@ -71,21 +71,19 @@
                     @enderror
                 </div>
 
-                <!-- Role Assypart -->
+                <!-- Role Mtnhealth -->
                 <div>
-                    <label for="role_assypart" class="block text-sm font-medium text-slate-700 mb-2">
-                        Role <span class="text-red-500">*</span>
+                    <label for="role_mtnhealth" class="block text-sm font-medium text-slate-700 mb-2">
+                        Role MTN Health <span class="text-slate-400">(optional)</span>
                     </label>
-                    <select id="role_assypart" 
-                            name="role_assypart" 
-                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('role_assypart') border-red-500 @enderror"
-                            required>
-                        <option value="">-- Pilih Role --</option>
-                        <option value="admin" {{ old('role_assypart') == 'admin' ? 'selected' : '' }}>Admin - Kelola semua data Part</option>
-                        <option value="tech_shopfloor" {{ old('role_assypart') == 'tech_shopfloor' ? 'selected' : '' }}>Tech Shopfloor - Create Work Order & Install Part</option>
-                        <option value="tech_workshop" {{ old('role_assypart') == 'tech_workshop' ? 'selected' : '' }}>Tech Workshop - Repair Work Order</option>
+                    <select id="role_mtnhealth" 
+                            name="role_mtnhealth" 
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('role_mtnhealth') border-red-500 @enderror">
+                        <option value="">-- Pilih Role MTN Health --</option>
+                        <option value="admin" {{ old('role_mtnhealth') == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="user" {{ old('role_mtnhealth') == 'user' ? 'selected' : '' }}>User</option>
                     </select>
-                    @error('role_assypart')
+                    @error('role_mtnhealth')
                     <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
                     @enderror
                 </div>

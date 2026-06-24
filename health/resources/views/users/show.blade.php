@@ -55,6 +55,16 @@
                     @endif
                 </div>
                 <div>
+                    <p class="text-sm text-slate-500 mb-1">Role MTN Health</p>
+                    @if($user->role_mtnhealth)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium bg-green-100 text-green-700">
+                        <i class="fas fa-heartbeat text-xs"></i> {{ ucfirst($user->role_mtnhealth) }}
+                    </span>
+                    @else
+                    <span class="text-slate-400 text-sm">-</span>
+                    @endif
+                </div>
+                <div>
                     <p class="text-sm text-slate-500 mb-1">Created At</p>
                     <p class="text-slate-800 font-medium">{{ $user->created_at->format('d M Y, H:i') }}</p>
                 </div>
