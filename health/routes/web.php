@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\HealthCheckController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,6 +34,9 @@ Route::middleware('auth')->group(function () {
     // Profile
     Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
+    // Health Checks (semua user yang login)
+    Route::resource('health-checks', HealthCheckController::class);
 
     // Admin Only Routes
     Route::middleware('admin')->group(function () {
