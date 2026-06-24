@@ -31,72 +31,52 @@
 /* Alpine.js cloak */
 [x-cloak] { display: none !important; }
 
-/* Glassmorphism sidebar - darker with teal undertone */
+/* Solid professional sidebar */
 .glass-sidebar {
-    background: linear-gradient(135deg, rgba(17, 24, 39, 0.99) 0%, rgba(6, 78, 59, 0.15) 50%, rgba(2, 6, 23, 1) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: #0d1f1e;
+    border-right: 1px solid rgba(20, 184, 166, 0.12);
 }
 
-/* Fresh mint gradient background */
+/* Clean light background */
 .gradient-bg {
-    background: linear-gradient(135deg, #f0fdfa 0%, #f0fdf4 50%, #ecfdf5 100%);
+    background: #f8fafb;
 }
 
-/* Nav item hover glow */
+/* Nav item */
 .nav-item {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     position: relative;
-    overflow: hidden;
-}
-
-.nav-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: linear-gradient(to bottom, #2dd4bf, #10b981);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
-    border-radius: 0 4px 4px 0;
-}
-
-.nav-item:hover::before,
-.nav-item.active::before {
-    transform: scaleY(1);
+    border-radius: 10px;
 }
 
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateX(4px);
+    background: rgba(20, 184, 166, 0.1);
 }
 
 .nav-item.active {
-    background: rgba(20, 184, 166, 0.15);
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%);
+    border: 1px solid rgba(20, 184, 166, 0.25);
 }
 
 /* Icon animation */
 .nav-icon {
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .nav-item:hover .nav-icon {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
-/* Top navbar glassmorphism */
+/* Top navbar */
 .glass-navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
 }
 
-/* Logo styling */
+/* Logo text */
 .logo-text {
-    background: linear-gradient(135deg, #f0fdfa 0%, #5eead4 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #5eead4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -104,29 +84,25 @@
 
 /* Decorative elements */
 .sidebar-decoration {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(20, 184, 166, 0.08) 0%, transparent 70%);
-    pointer-events: none;
+    display: none;
 }
 
 /* Scrollbar styling */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
+    background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
+    background: rgba(20, 184, 166, 0.3);
+    border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(20, 184, 166, 0.5);
 }
 
 /* Tom Select customization */
