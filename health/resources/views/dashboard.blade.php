@@ -9,56 +9,52 @@
 <div class="space-y-6">
 
     {{-- Stats Row --}}
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-users text-emerald-600 text-xl"></i>
+    <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-3">
+                <i class="fas fa-users text-emerald-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Karyawan</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($totalEmployees) }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Total Karyawan</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($totalEmployees) }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-heartbeat text-blue-600 text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                <i class="fas fa-heartbeat text-blue-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Cek Hari Ini</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($totalChecksToday) }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Cek Hari Ini</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($totalChecksToday) }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-calendar-check text-violet-600 text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-3">
+                <i class="fas fa-calendar-check text-violet-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Cek Bulan Ini</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($totalChecksMonth) }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Cek Bulan Ini</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($totalChecksMonth) }}</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-exclamation-triangle text-red-500 text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center mb-3">
+                <i class="fas fa-exclamation-triangle text-red-500 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Abnormal Hari Ini</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ number_format($abnormalToday) }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Abnormal Hari Ini</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ number_format($abnormalToday) }}</p>
         </div>
     </div>
 
     {{-- Alert: belum cek hari ini --}}
     @if($notCheckedToday > 0)
-    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3">
-        <i class="fas fa-clock text-amber-500 text-lg"></i>
-        <p class="text-amber-800 text-sm font-medium">
-            <span class="font-bold">{{ $notCheckedToday }} karyawan</span> belum melakukan pemeriksaan kesehatan hari ini.
-        </p>
-        <a href="{{ route('health-checks.index') }}" class="ml-auto text-xs font-semibold text-amber-700 hover:text-amber-900 underline whitespace-nowrap">Lihat detail</a>
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+        <div class="flex items-start gap-3">
+            <i class="fas fa-clock text-amber-500 text-lg mt-0.5 shrink-0"></i>
+            <div class="flex-1 min-w-0">
+                <p class="text-amber-800 text-sm font-medium">
+                    <span class="font-bold">{{ $notCheckedToday }} karyawan</span> belum melakukan pemeriksaan kesehatan hari ini.
+                </p>
+                <a href="{{ route('health-checks.index') }}" class="mt-1 inline-block text-xs font-semibold text-amber-700 hover:text-amber-900 underline">Lihat detail →</a>
+            </div>
+        </div>
     </div>
     @endif
 
@@ -169,35 +165,29 @@
 <div class="space-y-6">
 
     {{-- Stats Row --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-heartbeat text-emerald-600 text-xl"></i>
+    <div class="grid grid-cols-3 gap-3">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center mb-3">
+                <i class="fas fa-heartbeat text-emerald-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Cek Bulan Ini</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ $myChecksMonth }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Cek Bulan Ini</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $myChecksMonth }}</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-history text-blue-600 text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
+                <i class="fas fa-history text-blue-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Pemeriksaan</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ $myChecksTotal }}</p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Total Pemeriksaan</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ $myChecksTotal }}</p>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-12 h-12 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
-                <i class="fas fa-calendar-day text-violet-600 text-xl"></i>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-shadow">
+            <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center mb-3">
+                <i class="fas fa-calendar-day text-violet-600 text-base"></i>
             </div>
-            <div>
-                <p class="text-xs text-gray-500 font-medium uppercase tracking-wide">Terakhir Cek</p>
-                <p class="text-sm font-bold text-gray-800 mt-0.5">
-                    {{ $myLastCheck ? $myLastCheck->checked_at->format('d M Y') : '-' }}
-                </p>
-            </div>
+            <p class="text-xs text-gray-500 font-medium leading-tight">Terakhir Cek</p>
+            <p class="text-sm font-bold text-gray-800 mt-1">
+                {{ $myLastCheck ? $myLastCheck->checked_at->format('d M Y') : '-' }}
+            </p>
         </div>
     </div>
 
