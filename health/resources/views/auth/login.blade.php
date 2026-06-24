@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Login - Assy Part</title>
+    <title>Login - MTN Health</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,14 +38,14 @@
         }
         
         .btn-login {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
             transition: all 0.3s ease;
         }
         
         .btn-login:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            background: linear-gradient(135deg, #16a34a 0%, #166534 100%);
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
         }
         
         .floating-shapes {
@@ -65,7 +65,7 @@
         .shape-1 {
             width: 400px;
             height: 400px;
-            background: #3b82f6;
+            background: #22c55e;
             top: -100px;
             right: -100px;
         }
@@ -98,11 +98,11 @@
         <div class="w-full max-w-md">
             <!-- Logo -->
             <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg mb-4">
-                    <i class="fas fa-warehouse text-white text-2xl"></i>
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 shadow-lg mb-4">
+                    <i class="fas fa-heartbeat text-white text-2xl"></i>
                 </div>
-                <h1 class="text-3xl font-bold text-white">Assy Part</h1>
-                <p class="text-slate-400 mt-2">Assy Part Track & Trace</p>
+                <h1 class="text-3xl font-bold text-white">MTN Health</h1>
+                <p class="text-slate-400 mt-2">Health Check Management System</p>
             </div>
             
             <!-- Login Card -->
@@ -179,7 +179,7 @@
             
             <!-- Footer -->
             <p class="text-center text-slate-500 text-sm mt-6">
-                &copy; {{ date('Y') }} Assy Part. All rights reserved.
+                &copy; {{ date('Y') }} MTN Health. All rights reserved.
             </p>
         </div>
     </div>
