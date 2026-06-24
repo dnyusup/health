@@ -100,7 +100,7 @@
                                 </div>
                                 <div class="hidden md:block text-left">
                                     <p class="text-sm font-medium text-slate-800">{{ auth()->user()->name }}</p>
-                                    <p class="text-xs text-slate-500">{{ auth()->user()->assypartRoleLabel() }}</p>
+                                    <p class="text-xs text-slate-500">{{ auth()->user()->isAdmin() ? 'Admin' : 'User' }}</p>
                                 </div>
                                 <i class="fas fa-chevron-down text-slate-400 text-xs hidden md:block"></i>
                             </button>
