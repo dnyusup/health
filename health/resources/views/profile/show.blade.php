@@ -36,6 +36,21 @@
                                     @endif
                                 </dd>
                             </div>
+                            <div class="py-3 flex justify-between items-center">
+                                <dt class="text-sm text-gray-500">Supervisor</dt>
+                                <dd class="text-sm text-gray-900">
+                                    @if($user->supervisor)
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center text-white text-[10px] font-semibold">
+                                            {{ strtoupper(substr($user->supervisor->name, 0, 2)) }}
+                                        </div>
+                                        <span class="font-medium">{{ $user->supervisor->name }}</span>
+                                    </div>
+                                    @else
+                                    <span class="text-gray-400">-</span>
+                                    @endif
+                                </dd>
+                            </div>
                             <div class="py-3 flex justify-between">
                                 <dt class="text-sm text-gray-500">Joined</dt>
                                 <dd class="text-sm text-gray-900">{{ $user->created_at->format('d M Y') }}</dd>

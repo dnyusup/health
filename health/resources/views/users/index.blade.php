@@ -68,6 +68,7 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">User ID</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Email</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Role MTN Health</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Supervisor</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -92,6 +93,18 @@
                                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                     <i class="fas fa-heartbeat text-[9px]"></i> {{ ucfirst($user->role_mtnhealth) }}
                                 </span>
+                                @else
+                                <span class="text-slate-400 text-xs">-</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($user->supervisor)
+                                <div class="flex items-center gap-2">
+                                    <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center text-white text-[10px] font-semibold">
+                                        {{ strtoupper(substr($user->supervisor->name, 0, 2)) }}
+                                    </div>
+                                    <span class="text-sm text-slate-700">{{ $user->supervisor->name }}</span>
+                                </div>
                                 @else
                                 <span class="text-slate-400 text-xs">-</span>
                                 @endif
@@ -126,7 +139,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
+                            <td colspan="7" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center">
                                     <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
                                         <i class="fas fa-users text-2xl text-slate-400"></i>

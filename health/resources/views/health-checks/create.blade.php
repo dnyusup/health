@@ -29,7 +29,7 @@
                             required>
                         <option value="">-- Pilih User --</option>
                         @foreach($users as $u)
-                        <option value="{{ $u->id }}" {{ old('user_id') == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->user_id }})</option>
+                        <option value="{{ $u->id }}" {{ old('user_id', auth()->id()) == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->user_id }})</option>
                         @endforeach
                     </select>
                     @error('user_id')<p class="mt-1 text-sm text-red-500">{{ $message }}</p>@enderror

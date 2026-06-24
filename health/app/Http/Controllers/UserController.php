@@ -43,7 +43,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        $users = User::orderBy('name')->get();
+        return view('users.create', compact('users'));
     }
 
     /**
@@ -58,6 +59,7 @@ class UserController extends Controller
             'password' => 'required|string|min:6|confirmed',
             'role' => 'required|in:admin,user',
             'role_mtnhealth' => 'nullable|string|max:50',
+            'supervisor_id' => 'nullable|exists:users,id',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -81,7 +83,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $users = User::where('id', '!=', $user->id)->orderBy('name')->get();
+        return view('users.edit', compact('user', 'users'));
     }
 
     /**
@@ -96,6 +99,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:6|confirmed',
             'role' => 'required|in:admin,user',
             'role_mtnhealth' => 'nullable|string|max:50',
+            'supervisor_id' => 'nullable|exists:users,id',
         ]);
 
         if (empty($validated['password'])) {

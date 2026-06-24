@@ -53,6 +53,22 @@
                     @endif
                 </div>
                 <div>
+                    <p class="text-sm text-slate-500 mb-1">Supervisor</p>
+                    @if($user->supervisor)
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-400 to-indigo-500 flex items-center justify-center text-white text-xs font-semibold">
+                            {{ strtoupper(substr($user->supervisor->name, 0, 2)) }}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-slate-800">{{ $user->supervisor->name }}</p>
+                            <p class="text-xs font-mono text-slate-500">{{ $user->supervisor->user_id }}</p>
+                        </div>
+                    </div>
+                    @else
+                    <span class="text-slate-400 text-sm">-</span>
+                    @endif
+                </div>
+                <div>
                     <p class="text-sm text-slate-500 mb-1">Created At</p>
                     <p class="text-slate-800 font-medium">{{ $user->created_at->format('d M Y, H:i') }}</p>
                 </div>

@@ -90,6 +90,24 @@
                     @enderror
                 </div>
 
+                <!-- Supervisor -->
+                <div>
+                    <label for="supervisor_id" class="block text-sm font-medium text-slate-700 mb-2">
+                        Supervisor <span class="text-slate-400">(optional)</span>
+                    </label>
+                    <select id="supervisor_id" 
+                            name="supervisor_id" 
+                            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('supervisor_id') border-red-500 @enderror">
+                        <option value="">-- Pilih Supervisor --</option>
+                        @foreach($users as $u)
+                        <option value="{{ $u->id }}" {{ old('supervisor_id') == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->user_id }})</option>
+                        @endforeach
+                    </select>
+                    @error('supervisor_id')
+                    <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Password -->
                     <div>

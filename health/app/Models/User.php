@@ -19,6 +19,7 @@ class User extends Authenticatable
         'password',
         'role',
         'role_mtnhealth',
+        'supervisor_id',
     ];
 
     protected $hidden = [
@@ -45,5 +46,15 @@ class User extends Authenticatable
     public function isUser(): bool
     {
         return $this->role === 'user';
+    }
+
+    public function supervisor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function subordinates(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(User::class, 'supervisor_id');
     }
 }
