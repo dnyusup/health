@@ -66,18 +66,18 @@
             </ul>
         </li>
         <li class="mt-auto">
-            <div class="rounded-2xl bg-slate-800/50 p-4 border border-slate-700/50">
+            <div class="rounded-2xl bg-slate-800/50 p-4 border border-teal-700/30">
                 <div class="flex items-center gap-3 mb-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                        <i class="fas fa-layer-group text-white"></i>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-heartbeat text-white"></i>
                     </div>
                     <div>
-                        <p class="text-sm font-semibold text-white">APP TEMPLATE</p>
+                        <p class="text-sm font-semibold text-white">HEALTH TRACE</p>
                         <p class="text-[10px] text-slate-500">v1.0.0</p>
                     </div>
                 </div>
                 <p class="text-[11px] text-slate-500 leading-relaxed">
-                    Laravel Web Application Template
+                    Health Monitoring System
                 </p>
             </div>
         </li>

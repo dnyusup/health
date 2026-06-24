@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'App' }} - Web Application</title>
+    <title>{{ $title ?? 'Health Trace' }} - Health Trace</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     @vite(["resources/css/app.css", "resources/js/app.js"])
 </head>
@@ -36,10 +36,10 @@
             
             <div class="flex h-20 shrink-0 items-center justify-between px-6 border-b border-slate-700/50">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                        <i class="fas fa-cogs text-white text-lg"></i>
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                        <i class="fas fa-heartbeat text-white text-lg"></i>
                     </div>
-                    <span class="text-2xl font-bold logo-text">App Template</span>
+                    <span class="text-2xl font-bold logo-text">Health Trace</span>
                 </div>
                 <button @click="sidebarOpen = false" class="w-8 h-8 rounded-lg bg-slate-700/50 flex items-center justify-center text-slate-400 hover:bg-slate-600 hover:text-white transition-all">
                     <i class="fas fa-times"></i>
@@ -58,12 +58,12 @@
                 
                 <div class="flex h-20 shrink-0 items-center border-b border-slate-700/50">
                     <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
-                            <i class="fas fa-cogs text-white text-xl"></i>
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                            <i class="fas fa-heartbeat text-white text-xl"></i>
                         </div>
                         <div>
-                        <span class="text-2xl font-bold logo-text">App Template</span>
-                        <p class="text-[10px] text-slate-500 tracking-wider uppercase">Laravel Web Template</p>
+                        <span class="text-2xl font-bold logo-text">Health Trace</span>
+                        <p class="text-[10px] text-slate-500 tracking-wider uppercase">Health Monitoring System</p>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                         <!-- User dropdown -->
                         <div x-data="{ userOpen: false }" class="relative">
                             <button @click="userOpen = !userOpen" class="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-slate-100 transition-colors">
-                                <div class="w-9 h-9 rounded-full bg-gradient-to-br {{ auth()->user()->isAdmin() ? 'from-amber-500 to-orange-500' : 'from-slate-600 to-slate-700' }} flex items-center justify-center shadow-lg">
+                                <div class="w-9 h-9 rounded-full bg-gradient-to-br {{ auth()->user()->role_mtnhealth === 'admin' ? 'from-teal-500 to-emerald-500' : 'from-slate-600 to-slate-700' }} flex items-center justify-center shadow-lg">
                                     <span class="text-white text-sm font-semibold">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</span>
                                 </div>
                                 <div class="hidden md:block text-left">
