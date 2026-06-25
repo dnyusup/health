@@ -53,13 +53,19 @@ class DashboardController extends Controller
             $checkedUserIds   = $checkQuery()->whereDate('checked_at', $today)->pluck('user_id');
             $notCheckedToday  = (clone $userQuery)->whereNotIn('id', $checkedUserIds)->count();
 
+            // Supervisor's own health data
+            $myLastCheck   = HealthCheck::where('user_id', $user->id)->latest('checked_at')->first();
+            $myChecksMonth = HealthCheck::where('user_id', $user->id)->where('checked_at', '>=', $monthStart)->count();
+
             return view('dashboard', compact(
                 'totalEmployees',
                 'totalChecksToday',
                 'totalChecksMonth',
                 'abnormalToday',
                 'recentChecks',
-                'notCheckedToday'
+                'notCheckedToday',
+                'myLastCheck',
+                'myChecksMonth'
             ));
         }
 

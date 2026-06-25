@@ -58,6 +58,72 @@
     </div>
     @endif
 
+    {{-- My Own Health (for supervisor only, not admin) --}}
+    @if(!$user->isAdmin())
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-user-circle text-emerald-500"></i>
+                <h2 class="text-base font-semibold text-gray-800">Kesehatan Saya</h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-400">{{ $myChecksMonth }} cek bulan ini</span>
+                <a href="{{ route('health-checks.create') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors">
+                    <i class="fas fa-plus text-[10px]"></i> Tambah Cek
+                </a>
+            </div>
+        </div>
+        @if($myLastCheck)
+        @php
+            $myBp   = $myLastCheck->getBloodPressureStatus();
+            $myO2   = $myLastCheck->getOxygenStatus();
+            $myTemp = $myLastCheck->getTemperatureStatus();
+        @endphp
+        <div class="p-5">
+            <p class="text-xs text-gray-400 mb-3">Pemeriksaan terakhir: {{ $myLastCheck->checked_at->format('d M Y, H:i') }}</p>
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div class="rounded-xl p-3.5 {{ in_array($myBp,['high1','high2']) ? 'bg-red-50' : ($myBp === 'elevated' ? 'bg-amber-50' : 'bg-emerald-50') }}">
+                    <p class="text-xs text-gray-500 mb-1">Tekanan Darah</p>
+                    <p class="text-lg font-bold {{ in_array($myBp,['high1','high2']) ? 'text-red-700' : ($myBp === 'elevated' ? 'text-amber-700' : 'text-emerald-700') }}">
+                        {{ $myLastCheck->systolic && $myLastCheck->diastolic ? $myLastCheck->systolic.'/'.$myLastCheck->diastolic : '-' }}
+                    </p>
+                    <p class="text-xs mt-0.5 text-gray-400">mmHg</p>
+                </div>
+                <div class="rounded-xl p-3.5 {{ $myO2 !== 'normal' ? 'bg-red-50' : 'bg-emerald-50' }}">
+                    <p class="text-xs text-gray-500 mb-1">Saturasi O₂</p>
+                    <p class="text-lg font-bold {{ $myO2 !== 'normal' ? 'text-red-700' : 'text-emerald-700' }}">
+                        {{ $myLastCheck->oxygen_saturation ? number_format($myLastCheck->oxygen_saturation, 1).'%' : '-' }}
+                    </p>
+                    <p class="text-xs mt-0.5 text-gray-400">SpO₂</p>
+                </div>
+                <div class="rounded-xl p-3.5 {{ in_array($myTemp,['fever','high_fever']) ? 'bg-red-50' : ($myTemp === 'low' ? 'bg-blue-50' : 'bg-emerald-50') }}">
+                    <p class="text-xs text-gray-500 mb-1">Suhu Tubuh</p>
+                    <p class="text-lg font-bold {{ in_array($myTemp,['fever','high_fever']) ? 'text-red-700' : ($myTemp === 'low' ? 'text-blue-700' : 'text-emerald-700') }}">
+                        {{ $myLastCheck->body_temperature ? number_format($myLastCheck->body_temperature, 1).'°C' : '-' }}
+                    </p>
+                    <p class="text-xs mt-0.5 text-gray-400">Celcius</p>
+                </div>
+                <div class="rounded-xl p-3.5 bg-gray-50">
+                    <p class="text-xs text-gray-500 mb-1">Berat Badan</p>
+                    <p class="text-lg font-bold text-gray-700">
+                        {{ $myLastCheck->weight ? number_format($myLastCheck->weight, 1).' kg' : '-' }}
+                    </p>
+                    <p class="text-xs mt-0.5 text-gray-400">Kilogram</p>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="px-6 py-8 text-center">
+            <i class="fas fa-heartbeat text-3xl text-gray-200 mb-2 block"></i>
+            <p class="text-gray-400 text-sm">Belum ada data pemeriksaan Anda.</p>
+            <a href="{{ route('health-checks.create') }}" class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors">
+                <i class="fas fa-plus"></i> Tambah Pemeriksaan
+            </a>
+        </div>
+        @endif
+    </div>
+    @endif
+
     {{-- Recent Health Checks --}}
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
         <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
