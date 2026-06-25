@@ -40,7 +40,7 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role_mtnhealth === 'admin' || $this->role === 'admin';
+        return $this->role_mtnhealth === 'admin';
     }
 
     public function getRoleLabel(): string
@@ -49,7 +49,7 @@ class User extends Authenticatable
             'admin'      => 'Admin',
             'supervisor' => 'Supervisor',
             'user'       => 'User',
-            default      => $this->role === 'admin' ? 'Admin' : 'User',
+            default      => 'User',
         };
     }
 
