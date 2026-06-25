@@ -14,13 +14,25 @@ class DashboardController extends Controller
         $today = now()->toDateString();
         $monthStart = now()->startOfMonth();
 
-        if ($user->isAdmin() || $user->role === 'supervisor') {
-            $totalEmployees = User::where('role', 'user')->count();
-            $totalChecksToday = HealthCheck::whereDate('checked_at', $today)->count();
-            $totalChecksMonth = HealthCheck::where('checked_at', '>=', $monthStart)->count();
+        if ($user->isAdmin() || $user->isSupervisor()) {
+            // Scope: admin sees all, supervisor sees only their subordinates
+            $subordinateIds = $user->isAdmin()
+                ? null
+                : $user->subordinates()->pluck('id');
 
-            // Abnormal readings today: BP high, O2 low, or fever
-            $abnormalToday = HealthCheck::whereDate('checked_at', $today)
+            $userQuery = $user->isAdmin()
+                ? User::where('role', 'user')
+                : User::whereIn('id', $subordinateIds);
+
+            $checkQuery = fn() => $user->isAdmin()
+                ? HealthCheck::query()
+                : HealthCheck::whereIn('user_id', $subordinateIds);
+
+            $totalEmployees    = $userQuery->count();
+            $totalChecksToday  = $checkQuery()->whereDate('checked_at', $today)->count();
+            $totalChecksMonth  = $checkQuery()->where('checked_at', '>=', $monthStart)->count();
+
+            $abnormalToday = $checkQuery()->whereDate('checked_at', $today)
                 ->where(function ($q) {
                     $q->where(function ($q2) {
                             $q2->whereNotNull('systolic')->where('systolic', '>=', 140);
@@ -33,16 +45,13 @@ class DashboardController extends Controller
                         });
                 })->count();
 
-            $recentChecks = HealthCheck::with('user')
+            $recentChecks = $checkQuery()->with('user')
                 ->latest('checked_at')
                 ->limit(10)
                 ->get();
 
-            // Employees not yet checked today
-            $checkedUserIds = HealthCheck::whereDate('checked_at', $today)->pluck('user_id');
-            $notCheckedToday = User::where('role', 'user')
-                ->whereNotIn('id', $checkedUserIds)
-                ->count();
+            $checkedUserIds   = $checkQuery()->whereDate('checked_at', $today)->pluck('user_id');
+            $notCheckedToday  = (clone $userQuery)->whereNotIn('id', $checkedUserIds)->count();
 
             return view('dashboard', compact(
                 'totalEmployees',

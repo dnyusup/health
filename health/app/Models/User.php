@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    public function isSupervisor(): bool
+    {
+        return $this->role_mtnhealth === 'supervisor' || $this->subordinates()->exists();
+    }
+
     public function isUser(): bool
     {
         return $this->role === 'user';

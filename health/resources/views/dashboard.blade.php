@@ -4,7 +4,7 @@
 
 @php $user = auth()->user(); @endphp
 
-@if($user->isAdmin() || $user->role === 'supervisor')
+@if($user->isAdmin() || $user->isSupervisor())
 {{-- ===== ADMIN / SUPERVISOR VIEW ===== --}}
 <div class="space-y-6">
 
