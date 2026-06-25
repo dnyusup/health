@@ -18,15 +18,15 @@
             <form action="{{ route('health-checks.update', $healthCheck) }}" method="POST" class="space-y-6">
                 @csrf @method('PUT')
 
-                @if(auth()->user()->isAdmin())
+                @if($canFilter)
                 <div>
                     <label for="user_id" class="block text-sm font-medium text-slate-700 mb-2">
-                        User <span class="text-red-500">*</span>
+                        Karyawan <span class="text-red-500">*</span>
                     </label>
                     <select id="user_id" name="user_id"
                             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
                             required>
-                        @foreach($users as $u)
+                        @foreach($filterUsers as $u)
                         <option value="{{ $u->id }}" {{ old('user_id', $healthCheck->user_id) == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->user_id }})</option>
                         @endforeach
                     </select>

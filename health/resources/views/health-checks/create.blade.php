@@ -18,17 +18,17 @@
             <form action="{{ route('health-checks.store') }}" method="POST" class="space-y-6">
                 @csrf
 
-                @if(auth()->user()->isAdmin())
+                @if($canFilter)
                 <!-- User -->
                 <div>
                     <label for="user_id" class="block text-sm font-medium text-slate-700 mb-2">
-                        User <span class="text-red-500">*</span>
+                        Karyawan <span class="text-red-500">*</span>
                     </label>
                     <select id="user_id" name="user_id"
                             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('user_id') border-red-500 @enderror"
                             required>
-                        <option value="">-- Pilih User --</option>
-                        @foreach($users as $u)
+                        <option value="">-- Pilih Karyawan --</option>
+                        @foreach($filterUsers as $u)
                         <option value="{{ $u->id }}" {{ old('user_id', auth()->id()) == $u->id ? 'selected' : '' }}>{{ $u->name }} ({{ $u->user_id }})</option>
                         @endforeach
                     </select>
