@@ -84,6 +84,7 @@
                             class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all @error('role_mtnhealth') border-red-500 @enderror">
                         <option value="">-- Pilih Role MTN Health --</option>
                         <option value="admin" {{ old('role_mtnhealth', $user->role_mtnhealth) == 'admin' ? 'selected' : '' }}>Admin</option>
+                        <option value="supervisor" {{ old('role_mtnhealth', $user->role_mtnhealth) == 'supervisor' ? 'selected' : '' }}>Supervisor</option>
                         <option value="user" {{ old('role_mtnhealth', $user->role_mtnhealth) == 'user' ? 'selected' : '' }}>User</option>
                     </select>
                     @error('role_mtnhealth')
