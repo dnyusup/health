@@ -28,26 +28,39 @@ class HealthCheckController extends Controller
 
     public function index(Request $request)
     {
-        $user      = auth()->user();
-        $canFilter = $user->isAdmin() || $user->isSupervisor();
+        $user       = auth()->user();
+        $canFilter  = $user->isAdmin() || $user->isSupervisor();
         $visibleIds = $this->visibleUserIds();
 
-        $query = HealthCheck::with('user')->whereIn('user_id', $visibleIds);
+        // Always fetch own health data for charts
+        $myChecks    = HealthCheck::where('user_id', $user->id)
+                        ->orderBy('checked_at', 'asc')->limit(30)->get();
+        $myLastCheck = $myChecks->last();
 
-        if ($canFilter && $request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-        if ($request->filled('date_from')) {
-            $query->whereDate('checked_at', '>=', $request->date_from);
-        }
-        if ($request->filled('date_to')) {
-            $query->whereDate('checked_at', '<=', $request->date_to);
+        // Team records (only for supervisor/admin)
+        $records     = collect();
+        $filterUsers = collect();
+
+        if ($canFilter) {
+            $query = HealthCheck::with('user')->whereIn('user_id', $visibleIds);
+
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+            if ($request->filled('date_from')) {
+                $query->whereDate('checked_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('checked_at', '<=', $request->date_to);
+            }
+
+            $records     = $query->orderBy('checked_at', 'desc')->paginate(15)->withQueryString();
+            $filterUsers = User::whereIn('id', $visibleIds)->orderBy('name')->get();
         }
 
-        $records     = $query->orderBy('checked_at', 'desc')->paginate(15)->withQueryString();
-        $filterUsers = $canFilter ? User::whereIn('id', $visibleIds)->orderBy('name')->get() : collect();
-
-        return view('health-checks.index', compact('records', 'filterUsers', 'canFilter'));
+        return view('health-checks.index', compact(
+            'myChecks', 'myLastCheck', 'records', 'filterUsers', 'canFilter'
+        ));
     }
 
     public function create()
