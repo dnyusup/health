@@ -27,24 +27,24 @@
                     <div class="relative">
                         <input type="text"
                                x-model="search"
-                               @focus="open = true"
-                               @keydown.escape="open = false"
+                               x-on:focus="open = true"
+                               x-on:keydown.escape="open = false"
                                :placeholder="selectedId ? selectedName : 'Cari nama / ID...'"
                                :class="selectedId && !search ? 'text-slate-800 font-medium' : ''"
                                class="w-full rounded-lg border border-slate-300 pl-3 pr-8 py-2 text-sm focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                                autocomplete="off">
-                        <button type="button" @click="select(null); search = ''" x-show="selectedId || search"
+                        <button type="button" x-on:click="select(null); search = ''" x-show="selectedId || search"
                                 class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                             <i class="fas fa-times text-xs"></i>
                         </button>
                     </div>
-                    <div x-show="open" @click.outside="open = false"
+                    <div x-show="open" x-on:click.outside="open = false"
                          class="absolute z-20 mt-1 w-full max-h-56 overflow-y-auto bg-white border border-slate-200 rounded-xl shadow-lg">
-                        <div @click="select(null)" class="px-3 py-2 text-sm text-slate-500 hover:bg-slate-50 cursor-pointer border-b border-slate-100">
+                        <div x-on:click="select(null)" class="px-3 py-2 text-sm text-slate-500 hover:bg-slate-50 cursor-pointer border-b border-slate-100">
                             Semua Karyawan
                         </div>
                         <template x-for="u in filtered" :key="u.id">
-                            <div @click="select(u)"
+                            <div x-on:click="select(u)"
                                  :class="selectedId == u.id ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'"
                                  class="px-3 py-2 text-sm cursor-pointer flex items-center justify-between">
                                 <span x-text="u.name"></span>
